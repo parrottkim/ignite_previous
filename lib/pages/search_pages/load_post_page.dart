@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/models/chat_user.dart';
+import 'package:ignite/pages/chat_pages/detail_chat_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:provider/provider.dart';
@@ -26,20 +27,21 @@ class _LoadPostPageState extends State<LoadPostPage> {
   Map _images = Map<String, Image>();
   bool _imageLoaded = false;
 
-  Future<ChatUser> _getChatMembers(List<dynamic> members) async {
+  Future<ChatUser?> _getChatMembers(List<dynamic> members) async {
+    ChatUser? chatMember;
+
     for (var member in members) {
       await firestore.collection('user').doc(member).get().then((element) {
-        if (member != _authenticationProvider.currentUser!.uid) {
-          return ChatUser(
+        if (member != _authenticationProvider.currentUser!.uid)
+          chatMember = new ChatUser(
             id: element.id,
             username: element['username'],
             email: element['email'],
             avatar: element['avatar'],
           );
-        }
       });
     }
-    return ChatUser();
+    return chatMember;
   }
 
   Future _createChatGroup() async {
@@ -65,7 +67,10 @@ class _LoadPostPageState extends State<LoadPostPage> {
     final snapshot = await firestore.collection('chatgroup').doc(docId).get();
     ChatUser? chatMember = await _getChatMembers(snapshot['members']);
 
-    // Navigator.push(context, createRoute(DetailChatPage(chatgroupId: docId)));
+    Navigator.push(
+        context,
+        createRoute(
+            DetailChatPage(chatMember: chatMember!, chatgroupId: docId)));
   }
 
   Future _enterChatGroup() async {
@@ -82,15 +87,17 @@ class _LoadPostPageState extends State<LoadPostPage> {
           _authenticationProvider.currentUser!.uid,
           widget.snapshot['user']
         ])) {
-          ChatUser chatMember = await _getChatMembers(element['members']);
-          // Navigator.push(
-          //     context, createRoute(DetailChatPage(chatgroupId: element.id)));
+          ChatUser? chatMember = await _getChatMembers(element['members']);
+          Navigator.push(
+              context,
+              createRoute(DetailChatPage(
+                  chatMember: chatMember!, chatgroupId: element.id)));
         } else {
           await _createChatGroup();
           return;
         }
-        if (value.docs.isEmpty) await _createChatGroup();
       });
+      if (value.docs.isEmpty) await _createChatGroup();
     });
   }
 

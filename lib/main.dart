@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, value, widget) => MaterialApp(
-          debugShowCheckedModeBanner: false,
+          // debugShowCheckedModeBanner: false,
           title: 'Ignite',
           themeMode: value.themeMode,
           theme: ThemeData(

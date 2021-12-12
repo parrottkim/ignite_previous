@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:ignite/models/chat_user.dart';
+import 'package:ignite/pages/chat_pages/detail_chat_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +52,7 @@ class _ChatPageState extends State<ChatPage> {
     for (var member in members) {
       await firestore.collection('user').doc(member).get().then((element) {
         if (member != value.currentUser!.uid) {
-          chatMember = ChatUser(
+          return chatMember = ChatUser(
             id: element.id,
             username: element['username'],
             email: element['email'],
@@ -70,8 +71,10 @@ class _ChatPageState extends State<ChatPage> {
       child: InkWell(
         child: ListTile(
           onTap: () {
-            // Navigator.push(
-            //     context, createRoute(DetailChatPage(chatgroupId: query['id'])));
+            Navigator.push(
+                context,
+                createRoute(DetailChatPage(
+                    chatMember: chatMembers, chatgroupId: query['id'])));
           },
           minLeadingWidth: 10,
           leading: CircleAvatar(
