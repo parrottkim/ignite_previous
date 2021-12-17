@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:ignite/pages/dashboard_page.dart';
 import 'package:ignite/provider/profile_page_provider.dart';
 import 'package:ignite/services/service.dart';
+import 'package:ignite/widgets/circular_progress_widget.dart';
 import 'package:provider/provider.dart';
 
 class RegistrationPage extends StatefulWidget {
@@ -55,17 +56,12 @@ class _RegistrationPageState extends State<RegistrationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _registrationPageAppBar(),
-      body: _imageLoaded
-          ? _registrationPageBody()
-          : Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Center(child: CircularProgressIndicator())),
+      appBar: _appBar(),
+      body: _imageLoaded ? _bodyContainer() : CircularProgressWidget(),
     );
   }
 
-  AppBar _registrationPageAppBar() {
+  AppBar _appBar() {
     return AppBar(
       title: Text('게임 등록'),
       actions: [
@@ -83,18 +79,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
     );
   }
 
-  Widget _registrationPageBody() {
+  Widget _bodyContainer() {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.symmetric(horizontal: 16.0),
       child: FutureBuilder(
         future: firestore.collection('gamelist').orderBy('rank').get(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-          if (!snapshot.hasData)
-            return Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Center(child: CircularProgressIndicator()));
+          if (!snapshot.hasData) return CircularProgressWidget();
 
           return GridView.builder(
             shrinkWrap: true,

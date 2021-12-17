@@ -208,12 +208,12 @@ class _DetailChatPageState extends State<DetailChatPage> {
                       : Colors.grey[200],
                   borderRadius: messages[index]['sentBy'] ==
                           _authenticationProvider.currentUser!.uid
-                      ? BorderRadius.only(
+                      ? const BorderRadius.only(
                           topLeft: Radius.circular(10.0),
                           topRight: Radius.circular(10.0),
                           bottomLeft: Radius.circular(10.0),
                         )
-                      : BorderRadius.only(
+                      : const BorderRadius.only(
                           topLeft: Radius.circular(10.0),
                           topRight: Radius.circular(10.0),
                           bottomRight: Radius.circular(10.0),

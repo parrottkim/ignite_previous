@@ -71,7 +71,7 @@ class _SignInPageState extends State<SignInPage> {
     }
   }
 
-  void resetPasswordRequest() async {
+  _resetPasswordRequest() async {
     if (_resetController.text.isNotEmpty) {
       await _authenticationProvider
           .sendPasswordResetEmail(email: _resetController.text.trim())
@@ -113,15 +113,15 @@ class _SignInPageState extends State<SignInPage> {
       child: Scaffold(
         body: Column(
           children: [
-            _signInPageTitle(),
-            _signInWidget(),
+            _titleWidget(),
+            _inputWidget(),
           ],
         ),
       ),
     );
   }
 
-  Widget _signInPageTitle() {
+  Widget _titleWidget() {
     var textSpan = const TextSpan(
       children: <TextSpan>[
         TextSpan(
@@ -185,7 +185,7 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  Widget _signInWidget() {
+  Widget _inputWidget() {
     return Expanded(
       flex: 1,
       child: Container(
@@ -290,7 +290,7 @@ class _SignInPageState extends State<SignInPage> {
                 ),
               ),
               SizedBox(height: 15.0),
-              _resetPasswordDialog(context),
+              _resetPasswordButton(),
             ],
           ),
         ),
@@ -298,7 +298,7 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  Widget _resetPasswordDialog(BuildContext) {
+  Widget _resetPasswordButton() {
     return Container(
       alignment: Alignment.centerRight,
       child: InkWell(
@@ -306,57 +306,52 @@ class _SignInPageState extends State<SignInPage> {
           _resetController.clear();
           await showDialog(
             context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('이메일을 입력하세요'),
-                content: StatefulBuilder(
-                  builder: (context, setState) {
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 5),
-                          decoration: const BoxDecoration(
-                              border: Border(
-                                  bottom: BorderSide(color: Colors.redAccent))),
-                          child: TextField(
-                            controller: _resetController,
-                            focusNode: _resetFocusNode,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                                fillColor: Theme.of(context).primaryColor,
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0),
-                                labelText: 'Email',
-                                icon: const Icon(Icons.email),
-                                // prefix: Icon(icon),
-                                border: InputBorder.none),
-                            onSubmitted: (value) {
-                              resetPasswordRequest();
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 15.0),
-                        MaterialButton(
-                          onPressed: () {
-                            resetPasswordRequest();
-                          },
-                          color: Theme.of(context).primaryColor,
-                          disabledColor: Colors.grey[350],
-                          minWidth: double.infinity,
-                          height: 50,
-                          child: Text('확인',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 16)),
-                          textColor: Colors.white,
-                        ),
-                      ],
-                    );
-                  },
+            builder: (_) => AlertDialog(
+              title: Text('이메일을 입력하세요'),
+              content: StatefulBuilder(
+                builder: (context, setState) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      decoration: const BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(color: Colors.redAccent))),
+                      child: TextField(
+                        controller: _resetController,
+                        focusNode: _resetFocusNode,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                            fillColor: Theme.of(context).primaryColor,
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            labelText: 'Email',
+                            icon: const Icon(Icons.email),
+                            // prefix: Icon(icon),
+                            border: InputBorder.none),
+                        onSubmitted: (value) {
+                          _resetPasswordRequest();
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 15.0),
+                    MaterialButton(
+                      onPressed: () {
+                        _resetPasswordRequest();
+                      },
+                      color: Theme.of(context).primaryColor,
+                      disabledColor: Colors.grey[350],
+                      minWidth: double.infinity,
+                      height: 50,
+                      child: Text('확인',
+                          style: TextStyle(color: Colors.white, fontSize: 16)),
+                      textColor: Colors.white,
+                    ),
+                  ],
                 ),
-              );
-            },
+              ),
+            ),
           );
         },
         child: Text(

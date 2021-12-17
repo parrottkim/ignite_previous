@@ -31,9 +31,11 @@ dependencies:
     sdk: flutter
 
   provider: ^6.0.1
-  shared_preferences: ^2.0.9
+  shared_preferences: ^2.0.11
   intro_slider: ^3.0.2
   flutter_staggered_animations: ^1.0.0
+  local_auth: ^1.1.9
+  image_picker: ^0.8.4+4
 
   google_sign_in: ^5.2.1
   firebase_core: ^1.10.0

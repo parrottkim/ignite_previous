@@ -5,6 +5,7 @@ import 'package:ignite/models/chat_user.dart';
 import 'package:ignite/pages/chat_pages/detail_chat_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
 import 'package:ignite/services/service.dart';
+import 'package:ignite/widgets/circular_progress_widget.dart';
 import 'package:provider/provider.dart';
 
 import 'package:intl/intl.dart';
@@ -201,11 +202,11 @@ class _ChatPageState extends State<ChatPage> {
                       },
                     );
                   } else
-                    return Center(child: CircularProgressIndicator());
+                    return CircularProgressWidget();
                 }),
           );
         } else
-          return Center(child: CircularProgressIndicator());
+          return CircularProgressWidget();
       },
     );
   }
