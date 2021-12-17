@@ -159,7 +159,7 @@ class _LOLProfilePageState extends State<LOLProfilePage>
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(title: Text('League of Legends')),
-        body: _makeSearchTextField(),
+        body: _bodyContainer(),
       ),
     );
   }
@@ -254,7 +254,7 @@ class _LOLProfilePageState extends State<LOLProfilePage>
       return Text('소환사 정보가 없습니다');
   }
 
-  Widget _makeSearchTextField() {
+  Widget _bodyContainer() {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
       alignment: Alignment.center,

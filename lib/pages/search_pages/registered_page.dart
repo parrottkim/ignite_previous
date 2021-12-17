@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:ignite/pages/search_pages/load_post_page.dart';
+import 'package:ignite/pages/search_pages/detail_post_page.dart';
 import 'package:ignite/pages/search_pages/write_post_page.dart';
 import 'package:ignite/services/service.dart';
 
@@ -60,9 +60,9 @@ class _RegisteredPageState extends State<RegisteredPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _registeredPageAppBar(),
-      body: _registeredPageBody(),
-      floatingActionButton: _registeredFloatingActionButton(),
+      appBar: _appBar(),
+      body: _bodyContainer(),
+      floatingActionButton: _floatingActionButton(),
     );
   }
 
@@ -82,7 +82,7 @@ class _RegisteredPageState extends State<RegisteredPage> {
     );
   }
 
-  AppBar _registeredPageAppBar() {
+  AppBar _appBar() {
     return AppBar(
       title: Text('동료 찾기'),
       bottom: PreferredSize(
@@ -108,7 +108,7 @@ class _RegisteredPageState extends State<RegisteredPage> {
     );
   }
 
-  Widget _registeredPageBody() {
+  Widget _bodyContainer() {
     return StreamBuilder(
       stream: firestore
           .collection('board')
@@ -138,23 +138,21 @@ class _RegisteredPageState extends State<RegisteredPage> {
     );
   }
 
-  Widget? _registeredFloatingActionButton() {
-    _boardId != null
-        ? FloatingActionButton(
-            heroTag: null,
-            onPressed: () async {
-              final result = await Navigator.push(context,
-                  createRoute(WritePostPage(snapshot: widget.snapshot)));
-              if (result != null) {
-                changeRadioButtonIndex(result);
-                setState(() {
-                  _boardId = widget.snapshot.docs[result].id;
-                });
-              }
-            },
-            child: Icon(Icons.add),
-          )
-        : null;
+  Widget? _floatingActionButton() {
+    return FloatingActionButton(
+      heroTag: null,
+      onPressed: () async {
+        final result = await Navigator.push(
+            context, createRoute(WritePostPage(snapshot: widget.snapshot)));
+        if (result != null) {
+          changeRadioButtonIndex(result);
+          setState(() {
+            _boardId = widget.snapshot.docs[result].id;
+          });
+        }
+      },
+      child: Icon(Icons.add),
+    );
   }
 
   Widget _loadItems(AsyncSnapshot<dynamic> snapshot, int index) {
@@ -165,7 +163,7 @@ class _RegisteredPageState extends State<RegisteredPage> {
             onTap: () {
               Navigator.push(
                   context,
-                  createRoute(LoadPostPage(
+                  createRoute(DetailPostPage(
                       snapshot: snapshot.data.docs[index], game: 'lol')));
             },
             minLeadingWidth: 10,

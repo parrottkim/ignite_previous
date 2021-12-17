@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ignite/animations/fade_animations.dart';
 
-class HomeLogo extends StatefulWidget {
-  HomeLogo({Key? key}) : super(key: key);
-
-  @override
-  _HomeLogoState createState() => _HomeLogoState();
-}
-
-class _HomeLogoState extends State<HomeLogo> {
-  bool _isHovering = false;
+class HomeLogo extends StatelessWidget {
+  const HomeLogo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

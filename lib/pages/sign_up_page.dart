@@ -171,13 +171,13 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: _signUpPageAppBar(),
-        body: _signUpPageBody(),
+        appBar: _appBar(),
+        body: _bodyContainer(),
       ),
     );
   }
 
-  AppBar _signUpPageAppBar() {
+  AppBar _appBar() {
     return AppBar(
       elevation: 0.0,
       backgroundColor: Colors.transparent,
@@ -199,7 +199,7 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-  Widget _signUpPageBody() {
+  Widget _bodyContainer() {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.symmetric(horizontal: 30),
@@ -379,7 +379,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       signUpRequest();
                     }
                   : null,
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
               disabledColor: Colors.grey[350],
               child: Text('Sign Up',
                   style: TextStyle(color: Colors.white, fontSize: 16)),

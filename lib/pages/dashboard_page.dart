@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ignite/pages/chat_pages/chat_page.dart';
 import 'package:ignite/pages/home_pages/home_page.dart';
+import 'package:ignite/pages/my_pages/my_page.dart';
 import 'package:ignite/pages/search_pages/search_page.dart';
 import 'package:ignite/provider/bottom_navigation_provider.dart';
 import 'package:provider/provider.dart';
@@ -48,6 +49,7 @@ class _DashboardPageState extends State<DashboardPage> {
             HomePage(),
             SearchPage(),
             ChatPage(),
+            MyPage(),
           ],
           onPageChanged: (index) {
             _bottomNavigationProvider.updatePage(index);

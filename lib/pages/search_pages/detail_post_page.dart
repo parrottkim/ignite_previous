@@ -8,17 +8,17 @@ import 'package:ignite/services/service.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 
-class LoadPostPage extends StatefulWidget {
+class DetailPostPage extends StatefulWidget {
   final QueryDocumentSnapshot<Object> snapshot;
   final String game;
-  LoadPostPage({Key? key, required this.snapshot, required this.game})
+  DetailPostPage({Key? key, required this.snapshot, required this.game})
       : super(key: key);
 
   @override
-  _LoadPostPageState createState() => _LoadPostPageState();
+  _DetailPostPageState createState() => _DetailPostPageState();
 }
 
-class _LoadPostPageState extends State<LoadPostPage> {
+class _DetailPostPageState extends State<DetailPostPage> {
   late AuthenticationProvider _authenticationProvider;
 
   final firestore = FirebaseFirestore.instance;
@@ -133,13 +133,13 @@ class _LoadPostPageState extends State<LoadPostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _loadPostPageAppBar(),
-      body: _loadPostPageBody(),
-      floatingActionButton: _loadPostPageFloatingActionButton(),
+      appBar: _appBar(),
+      body: _bodyContainer(),
+      floatingActionButton: _floatingActionButton(),
     );
   }
 
-  AppBar _loadPostPageAppBar() {
+  AppBar _appBar() {
     return AppBar(
       title: Text('게시물 보기'),
       bottom: PreferredSize(
@@ -182,7 +182,7 @@ class _LoadPostPageState extends State<LoadPostPage> {
     );
   }
 
-  Widget _loadPostPageBody() {
+  Widget _bodyContainer() {
     return SingleChildScrollView(
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
@@ -216,7 +216,7 @@ class _LoadPostPageState extends State<LoadPostPage> {
     );
   }
 
-  Widget? _loadPostPageFloatingActionButton() {
+  Widget? _floatingActionButton() {
     return widget.snapshot['user'] != _authenticationProvider.currentUser!.uid
         ? FloatingActionButton(
             heroTag: null,
