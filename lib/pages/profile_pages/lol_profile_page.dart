@@ -156,11 +156,9 @@ class _LOLProfilePageState extends State<LOLProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(title: Text('League of Legends')),
-        body: _bodyContainer(),
-      ),
+    return Scaffold(
+      appBar: AppBar(title: Text('League of Legends')),
+      body: _bodyContainer(),
     );
   }
 

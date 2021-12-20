@@ -40,23 +40,21 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: PageView(
-          controller: _pageController,
-          physics: NeverScrollableScrollPhysics(),
-          children: [
-            HomePage(),
-            SearchPage(),
-            ChatPage(),
-            MyPage(),
-          ],
-          onPageChanged: (index) {
-            _bottomNavigationProvider.updatePage(index);
-          },
-        ),
-        bottomNavigationBar: _bottomNavigationBarWidget(),
+    return Scaffold(
+      body: PageView(
+        controller: _pageController,
+        physics: NeverScrollableScrollPhysics(),
+        children: [
+          HomePage(),
+          SearchPage(),
+          ChatPage(),
+          MyPage(),
+        ],
+        onPageChanged: (index) {
+          _bottomNavigationProvider.updatePage(index);
+        },
       ),
+      bottomNavigationBar: _bottomNavigationBarWidget(),
     );
   }
 

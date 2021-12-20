@@ -23,7 +23,8 @@ class _MyInfoPageState extends State<MyInfoPage> {
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
 
-  final ImagePicker _picker = ImagePicker();
+  late i.File _image;
+  final _picker = ImagePicker();
 
   late TextEditingController _usernameController;
   late TextEditingController _resetController;
@@ -35,55 +36,61 @@ class _MyInfoPageState extends State<MyInfoPage> {
   bool _isUsernameExists = true;
 
   Future getImage() async {
-    try {
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final pickedFile = await _picker.getImage(source: ImageSource.gallery);
 
-      String extension = pickedFile!.path.split('.').last;
-      if (extension == 'webp') {
-        showDialog(
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-                  title: Text('오류'),
-                  content: Text('.webp, .gif 확장자는 지원하지 않습니다.'),
-                  actions: [
-                    MaterialButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('OK'),
-                    ),
-                  ],
-                ));
+    setState(() {
+      if (pickedFile != null) {
+        _image = i.File(pickedFile.path);
       } else {
-        var path = 'ProfileImages/${_authenticationProvider.currentUser!.uid}';
+        print('No image selected.');
+      }
+    });
 
-        var task = storage.ref(path).putFile(i.File(pickedFile.path));
-        showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (BuildContext context) {
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  Opacity(
-                    opacity: 1.0,
-                    child: CircularProgressIndicator(
-                        valueColor:
-                            new AlwaysStoppedAnimation<Color>(Colors.white)),
+    String extension = pickedFile!.path.split('.').last;
+    if (extension == 'webp') {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+                title: Text('오류'),
+                content: Text('.webp, .gif 확장자는 지원하지 않습니다.'),
+                actions: [
+                  MaterialButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'),
                   ),
                 ],
-              );
-            });
-        await task;
-        Navigator.of(context).pop();
-        String downloadUrl = await storage.ref(path).getDownloadURL();
-        print(downloadUrl);
-        await firestore
-            .collection('user')
-            .doc(_authenticationProvider.currentUser!.uid)
-            .set({'avatar': downloadUrl}, SetOptions(merge: true));
-      }
-    } catch (e) {}
+              ));
+    } else {
+      var path = 'ProfileImages/${_authenticationProvider.currentUser!.uid}';
+
+      var task = storage.ref(path).putFile(i.File(pickedFile.path));
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return Stack(
+              alignment: Alignment.center,
+              children: [
+                Opacity(
+                  opacity: 1.0,
+                  child: CircularProgressIndicator(
+                      valueColor:
+                          new AlwaysStoppedAnimation<Color>(Colors.white)),
+                ),
+              ],
+            );
+          });
+      await task;
+      Navigator.of(context).pop();
+      String downloadUrl = await storage.ref(path).getDownloadURL();
+      print(downloadUrl);
+      await firestore
+          .collection('user')
+          .doc(_authenticationProvider.currentUser!.uid)
+          .set({'avatar': downloadUrl}, SetOptions(merge: true));
+    }
   }
 
   _checkUsernameExists(String name) async {
@@ -156,13 +163,11 @@ class _MyInfoPageState extends State<MyInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text("내 정보"),
-        ),
-        body: _bodyContainer(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("내 정보"),
       ),
+      body: _bodyContainer(),
     );
   }
 
@@ -206,7 +211,7 @@ class _MyInfoPageState extends State<MyInfoPage> {
                         alignment: Alignment.bottomRight,
                         child: FloatingActionButton(
                           onPressed: () async {
-                            await getImage();
+                            getImage();
                           },
                           child: Icon(
                             Icons.add_a_photo,
