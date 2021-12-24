@@ -7,81 +7,61 @@ class HomeLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        FadeAnimation(
-          duration: Duration(milliseconds: 500),
-          delay: Duration(milliseconds: 500),
-          offset: Offset(-10.0, 0.0),
-          child: Container(
-            height: 60.0,
-            padding: EdgeInsets.all(8.0),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
+        Row(
+          children: [
+            FadeAnimation(
+              duration: Duration(milliseconds: 500),
+              delay: Duration(milliseconds: 500),
+              offset: Offset(-10.0, 0.0),
+              child: Container(
+                height: 66.0,
+                padding: EdgeInsets.all(6.0),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 2.0, color: Colors.white),
+                  color: Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+                child: Image.asset('assets/images/icons/light_icon.png'),
+              ),
             ),
-            child: Image.asset(
-              'assets/images/icons/light_icon.png',
-              color: Theme.of(context).primaryColor,
+            SizedBox(width: 12.0),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                FadeAnimation(
+                  duration: Duration(milliseconds: 500),
+                  delay: Duration(milliseconds: 750),
+                  offset: Offset(10.0, 0.0),
+                  child: Text(
+                    'IGNITE',
+                    style: TextStyle(
+                      letterSpacing: 1.5,
+                      fontSize: 44.0,
+                      fontFamily: 'BebasNeue',
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                FadeAnimation(
+                  duration: Duration(milliseconds: 500),
+                  delay: Duration(milliseconds: 1000),
+                  offset: Offset(10.0, 0.0),
+                  child: Text(
+                    'YOUR PASSION',
+                    style: TextStyle(
+                      height: 0.8,
+                      fontSize: 44.0,
+                      fontFamily: 'BebasNeue',
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
+          ],
         ),
-        SizedBox(height: 10.0),
-        const FadeAnimation(
-          duration: Duration(milliseconds: 500),
-          delay: Duration(milliseconds: 750),
-          offset: Offset(-10.0, 0.0),
-          child: Text(
-            'IGNITE',
-            style: TextStyle(
-              fontSize: 40.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        SizedBox(height: 4.0),
-        const FadeAnimation(
-          duration: Duration(milliseconds: 500),
-          delay: Duration(milliseconds: 1000),
-          offset: Offset(-10.0, 0.0),
-          child: Text(
-            'your passion anytime, anywhere.\nIt doesn\'t matter who you are or what platform you\'re on.',
-            style: TextStyle(
-              fontSize: 16.0,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        SizedBox(height: 10.0),
-        // FadeAnimation(
-        //   duration: Duration(milliseconds: 500),
-        //   delay: Duration(milliseconds: 750),
-        //   offset: Offset(-10.0, 0.0),
-        //   child: InkWell(
-        //     onTap: () {},
-        //     onHover: (hovering) => setState(() => _isHovering = hovering),
-        //     child: Row(
-        //       children: [
-        //         Text(
-        //           'REGISTER YOUR ACCOUNT',
-        //           style: TextStyle(
-        //             fontWeight: FontWeight.bold,
-        //             fontSize: 16.0,
-        //             color: Colors.white,
-        //           ),
-        //         ),
-        //         SizedBox(width: 4.0),
-        //         Icon(
-        //           Icons.keyboard_arrow_right,
-        //           size: 16.0,
-        //           color: Colors.white,
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }

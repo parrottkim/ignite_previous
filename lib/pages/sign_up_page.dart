@@ -179,20 +179,9 @@ class _SignUpPageState extends State<SignUpPage> {
     return AppBar(
       elevation: 0.0,
       backgroundColor: Colors.transparent,
+      foregroundColor: Theme.of(context).primaryColor,
       title: Text(
         'Sign Up',
-        style: TextStyle(
-          color: Theme.of(context).primaryColor,
-        ),
-      ),
-      leading: IconButton(
-        onPressed: () {
-          Navigator.pop(context);
-        },
-        icon: Icon(
-          Icons.keyboard_arrow_left,
-          color: Theme.of(context).primaryColor,
-        ),
       ),
     );
   }

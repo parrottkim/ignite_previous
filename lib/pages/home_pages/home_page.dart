@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/animations/fade_animations.dart';
 import 'package:ignite/pages/my_pages/registration_page.dart';
+import 'package:ignite/provider/authentication_provider.dart';
 import 'package:ignite/provider/theme_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:ignite/widgets/home_logo.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,6 +19,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late AuthenticationProvider _authenticationProvider;
+
+  final firestore = FirebaseFirestore.instance;
+
   int _index = 0;
   PageController _pageController = PageController();
 
@@ -51,20 +58,74 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _authenticationProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
+      appBar: AppBar(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(10.0),
+          ),
+        ),
+        title:
+            Text('Hello, ${_authenticationProvider.currentUser!.displayName}!'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.notifications),
+            onPressed: () {},
+          ),
+          FutureBuilder(
+              future: firestore
+                  .collection('user')
+                  .doc(_authenticationProvider.currentUser!.uid)
+                  .get(),
+              builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                          blurRadius: 4.0,
+                          color: Colors.black,
+                          spreadRadius: 0.4)
+                    ],
+                  ),
+                  child: snapshot.hasData
+                      ? CircleAvatar(
+                          backgroundImage:
+                              NetworkImage(snapshot.data!['avatar']))
+                      : Container(),
+                );
+              }),
+          SizedBox(width: 14.0),
+        ],
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(size.height * 0.26),
+          child: Expanded(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 20.0),
+              child: HomeLogo(),
+            ),
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 26.0),
         child: Column(
           children: [
-            Container(
-              height: size.height * 0.45,
-              child: HomeLogo(),
-            ),
             _updateList(1250),
+            SizedBox(height: 30.0),
+            _proSettings(1500),
           ],
         ),
       ),
@@ -74,7 +135,7 @@ class _HomePageState extends State<HomePage> {
   Widget _updateList(int duration) {
     List<Widget> swiper = [
       Card(
-        elevation: 1.0,
+        elevation: 4.0,
         semanticContainer: true,
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -98,7 +159,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       Card(
-        elevation: 1.0,
+        elevation: 4.0,
         semanticContainer: true,
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -122,7 +183,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       Card(
-        elevation: 1.0,
+        elevation: 4.0,
         semanticContainer: true,
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -154,11 +215,10 @@ class _HomePageState extends State<HomePage> {
           duration: Duration(milliseconds: 500),
           delay: Duration(milliseconds: duration),
           offset: Offset(-10.0, 0.0),
-          child: Text('업데이트 소식',
-              style: TextStyle(
-                  fontSize: 22.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+          child: Text(
+            'News',
+            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+          ),
         ),
         SizedBox(height: 10.0),
         FadeAnimation(
@@ -166,7 +226,7 @@ class _HomePageState extends State<HomePage> {
           delay: Duration(milliseconds: duration),
           offset: Offset(-10.0, 0.0),
           child: SizedBox(
-            height: 240,
+            height: 200,
             child: PageView.builder(
               itemCount: 3,
               controller: _pageController,
@@ -174,6 +234,67 @@ class _HomePageState extends State<HomePage> {
               itemBuilder: (context, index) {
                 return swiper[index];
               },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _proSettings(int duration) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FadeAnimation(
+          duration: Duration(milliseconds: 500),
+          delay: Duration(milliseconds: duration),
+          offset: Offset(10.0, 0.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Pro settings',
+                style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+              ),
+              InkWell(
+                onTap: () {},
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+                  child: Text(
+                    'see details >',
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 10.0),
+        FadeAnimation(
+          duration: Duration(milliseconds: 500),
+          delay: Duration(milliseconds: duration),
+          offset: Offset(10.0, 0.0),
+          child: Card(
+            elevation: 4.0,
+            child: InkWell(
+              customBorder: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: ListTile(
+                onTap: () {},
+                minVerticalPadding: 20.0,
+                leading: Icon(Icons.person, size: 60.0),
+                title: Text(
+                  'Faker',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Monitor   BenQ XL2430T'),
+                    Text('Mouse     CORSAIR SABRE'),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

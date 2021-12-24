@@ -36,6 +36,7 @@ dependencies:
   flutter_staggered_animations: ^1.0.0
   local_auth: ^1.1.9
   image_picker: ^0.7.4
+  video_player: ^2.2.10
 
   google_sign_in: ^5.2.1
   firebase_core: ^1.10.0
@@ -79,6 +80,7 @@ flutter:
     - assets/images/game_icons/lol_lanes/
     - assets/images/intro/
     - assets/images/main/
+    - assets/videos/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
