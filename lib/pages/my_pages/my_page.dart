@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ignite/pages/get_started_page.dart';
 import 'package:ignite/pages/my_pages/my_info_page.dart';
 import 'package:ignite/pages/my_pages/notice_page.dart';
 import 'package:ignite/pages/my_pages/registration_page.dart';
-import 'package:ignite/pages/sign_in_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
 import 'package:ignite/services/service.dart';
-import 'package:ignite/widgets/dialog.dart';
 import 'package:local_auth/auth_strings.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
@@ -95,7 +94,7 @@ class _MyPageState extends State<MyPage> {
             await _authenticationProvider.signOut().then((result) {
               Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => SignInPage()),
+                  MaterialPageRoute(builder: (_) => GetStartedPage()),
                   (_) => false);
             }).catchError((error) {
               print('Sign Out Error: $error');

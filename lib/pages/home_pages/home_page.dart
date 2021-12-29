@@ -69,64 +69,92 @@ class _HomePageState extends State<HomePage> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(10.0),
-          ),
-        ),
-        title:
-            Text('Hello, ${_authenticationProvider.currentUser!.displayName}!'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.notifications),
-            onPressed: () {},
-          ),
-          FutureBuilder(
-              future: firestore
-                  .collection('user')
-                  .doc(_authenticationProvider.currentUser!.uid)
-                  .get(),
-              builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                          blurRadius: 4.0,
-                          color: Colors.black,
-                          spreadRadius: 0.4)
-                    ],
-                  ),
-                  child: snapshot.hasData
-                      ? CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(snapshot.data!['avatar']))
-                      : Container(),
-                );
-              }),
-          SizedBox(width: 14.0),
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size.fromHeight(size.height * 0.26),
-          child: Expanded(
-            flex: 2,
-            child: Padding(
-              padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 20.0),
-              child: HomeLogo(),
+      body: CustomScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        slivers: [
+          _appBarWidget(size),
+          SliverFillRemaining(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 26.0),
+              child: Column(
+                children: [
+                  _updateList(1250),
+                  SizedBox(height: 30.0),
+                  _proSettings(1500),
+                ],
+              ),
             ),
           ),
+        ],
+      ),
+      // body: SingleChildScrollView(
+      //   padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 26.0),
+      //   child: Column(
+      //     children: [
+      //       _updateList(1250),
+      //       SizedBox(height: 30.0),
+      //       _proSettings(1500),
+      //     ],
+      //   ),
+      // ),
+    );
+  }
+
+  SliverAppBar _appBarWidget(Size size) {
+    return SliverAppBar(
+      floating: false,
+      pinned: true,
+      snap: false,
+      elevation: 0.0,
+      expandedHeight: size.height * 0.35,
+      foregroundColor: Colors.black,
+      title: Text(
+        'Hello, ${_authenticationProvider.currentUser!.displayName}!',
+        style: TextStyle(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w300,
         ),
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 26.0),
-        child: Column(
-          children: [
-            _updateList(1250),
-            SizedBox(height: 30.0),
-            _proSettings(1500),
-          ],
+      actions: [
+        IconButton(
+          icon: Icon(Icons.notifications_outlined),
+          onPressed: () {},
+        ),
+        FutureBuilder(
+            future: firestore
+                .collection('user')
+                .doc(_authenticationProvider.currentUser!.uid)
+                .get(),
+            builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+              return snapshot.hasData
+                  ? CircleAvatar(
+                      backgroundImage: NetworkImage(snapshot.data!['avatar']))
+                  : Container();
+            }),
+        SizedBox(width: 14.0),
+      ],
+      flexibleSpace: FlexibleSpaceBar(
+        centerTitle: true,
+        background: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.cover,
+              image: AssetImage(
+                'assets/images/main/background.png',
+              ),
+            ),
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: EdgeInsets.only(top: 50.0, left: 20.0),
+                  child: HomeLogo(size: size),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

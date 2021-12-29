@@ -128,13 +128,13 @@ class _GetStartedPageState extends State<GetStartedPage> {
       children: [
         FadeAnimation(
           duration: Duration(milliseconds: 500),
-          delay: Duration(milliseconds: 500),
+          delay: Duration(milliseconds: 1500),
           offset: Offset(-10.0, 0.0),
           child: Text.rich(textSpan1),
         ),
         FadeAnimation(
           duration: Duration(milliseconds: 500),
-          delay: Duration(milliseconds: 750),
+          delay: Duration(milliseconds: 1750),
           offset: Offset(-10.0, 0.0),
           child: Text.rich(textSpan2),
         ),
@@ -145,7 +145,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
   Widget _signInButton() {
     return FadeAnimation(
       duration: Duration(milliseconds: 500),
-      delay: Duration(milliseconds: 1000),
+      delay: Duration(milliseconds: 3000),
       offset: Offset(-10.0, 0.0),
       child: SizedBox(
         width: MediaQuery.of(context).size.width,
@@ -167,7 +167,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
   Widget _signUpButton() {
     return FadeAnimation(
       duration: Duration(milliseconds: 500),
-      delay: Duration(milliseconds: 1250),
+      delay: Duration(milliseconds: 3250),
       offset: Offset(-10.0, 0.0),
       child: SizedBox(
         width: MediaQuery.of(context).size.width,

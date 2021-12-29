@@ -80,6 +80,7 @@ flutter:
     - assets/images/game_icons/lol_lanes/
     - assets/images/intro/
     - assets/images/main/
+    - assets/images/sign/
     - assets/videos/
 
   # An image asset can refer to one or more resolution-specific "variants", see

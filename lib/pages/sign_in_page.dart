@@ -43,11 +43,12 @@ class _SignInPageState extends State<SignInPage> {
             _loginStatus = 'You have successfully signed in';
             _loginStringColor = Colors.green;
           });
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (_) => DashboardPage(),
             ),
+            (_) => false,
           );
           _bottomNavigationProvider.updatePage(0);
         } else if (result == '이메일 주소 인증이 필요합니다') {
@@ -109,112 +110,130 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: _appBar(),
-      body: _bodyContainer(),
-    );
-  }
-
-  AppBar _appBar() {
-    return AppBar(
-      elevation: 0.0,
-      backgroundColor: Colors.transparent,
-      foregroundColor: Theme.of(context).primaryColor,
-      title: Text(
-        'Sign In',
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
       ),
+      body: _bodyContainer(size),
     );
   }
 
-  Widget _bodyContainer() {
-    return Container(
-      alignment: Alignment.center,
-      margin: const EdgeInsets.symmetric(horizontal: 30),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-              decoration: BoxDecoration(
-                  border: Border(bottom: BorderSide(color: Colors.redAccent))),
-              child: TextField(
-                controller: _emailController,
-                focusNode: _emailFocusNode,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                    fillColor: Colors.redAccent,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                    labelText: 'Email',
-                    icon: Icon(
-                      Icons.email,
-                    ),
-                    border: InputBorder.none),
-                onSubmitted: (value) {
-                  _emailFocusNode.unfocus();
-                  FocusScope.of(context).requestFocus(_passwordFocusNode);
-                },
+  Widget _bodyContainer(Size size) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: AlignmentDirectional.topCenter,
+      fit: StackFit.loose,
+      children: [
+        Image.asset('assets/images/sign/sign.png'),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            height: size.height * 0.6,
+            width: size.width,
+            padding: EdgeInsets.symmetric(vertical: 60.0, horizontal: 30.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.all(
+                Radius.circular(20.0),
               ),
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                  border: new Border(
-                      bottom: new BorderSide(color: Colors.redAccent))),
-              child: TextField(
-                controller: _passwordController,
-                focusNode: _passwordFocusNode,
-                obscureText: true,
-                decoration: InputDecoration(
-                    fillColor: Colors.redAccent,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                    labelText: 'Password',
-                    icon: Icon(
-                      Icons.lock,
-                    ),
-                    border: InputBorder.none),
-                onSubmitted: (value) {
-                  _passwordFocusNode.unfocus();
-                  signInRequest();
-                },
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Sign In',
+                  style: TextStyle(
+                    fontSize: 30.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 40.0),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 5.0),
+                  decoration: BoxDecoration(
+                      border:
+                          Border(bottom: BorderSide(color: Colors.redAccent))),
+                  child: TextField(
+                    controller: _emailController,
+                    focusNode: _emailFocusNode,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                        fillColor: Colors.redAccent,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        labelText: 'Email',
+                        icon: Icon(
+                          Icons.email,
+                        ),
+                        border: InputBorder.none),
+                    onSubmitted: (value) {
+                      _emailFocusNode.unfocus();
+                      FocusScope.of(context).requestFocus(_passwordFocusNode);
+                    },
+                  ),
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                      border: new Border(
+                          bottom: new BorderSide(color: Colors.redAccent))),
+                  child: TextField(
+                    controller: _passwordController,
+                    focusNode: _passwordFocusNode,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                        fillColor: Colors.redAccent,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                        labelText: 'Password',
+                        icon: Icon(
+                          Icons.lock,
+                        ),
+                        border: InputBorder.none),
+                    onSubmitted: (value) {
+                      _passwordFocusNode.unfocus();
+                      signInRequest();
+                    },
+                  ),
+                ),
+                SizedBox(height: 15),
+                _loginStatus != null
+                    ? Center(
+                        child: Text(
+                          _loginStatus,
+                          style: TextStyle(
+                            color: _loginStringColor,
+                            fontSize: 14.0,
+                          ),
+                        ),
+                      )
+                    : Container(),
+                SizedBox(height: 15.0),
+                MaterialButton(
+                  elevation: 0,
+                  minWidth: double.maxFinite,
+                  height: 50,
+                  onPressed: () {
+                    setState(() {
+                      _emailFocusNode.unfocus();
+                      _passwordFocusNode.unfocus();
+                    });
+                    signInRequest();
+                  },
+                  color: Theme.of(context).primaryColor,
+                  child: Text('Sign In',
+                      style: TextStyle(color: Colors.white, fontSize: 16)),
+                  textColor: Colors.white,
+                ),
+                SizedBox(height: 15.0),
+                _resetPasswordButton(),
+              ],
             ),
-            SizedBox(height: 15),
-            _loginStatus != null
-                ? Center(
-                    child: Text(
-                      _loginStatus,
-                      style: TextStyle(
-                        color: _loginStringColor,
-                        fontSize: 14.0,
-                      ),
-                    ),
-                  )
-                : Container(),
-            SizedBox(height: 15),
-            MaterialButton(
-              elevation: 0,
-              minWidth: double.maxFinite,
-              height: 50,
-              onPressed: () {
-                setState(() {
-                  _emailFocusNode.unfocus();
-                  _passwordFocusNode.unfocus();
-                });
-                signInRequest();
-              },
-              color: Theme.of(context).primaryColor,
-              child: Text('Sign In',
-                  style: TextStyle(color: Colors.white, fontSize: 16)),
-              textColor: Colors.white,
-            ),
-            SizedBox(height: 15.0),
-            _resetPasswordButton(),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 

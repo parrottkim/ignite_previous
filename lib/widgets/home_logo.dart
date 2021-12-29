@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ignite/animations/fade_animations.dart';
 
 class HomeLogo extends StatelessWidget {
-  const HomeLogo({Key? key}) : super(key: key);
+  final Size size;
+  const HomeLogo({Key? key, required this.size}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Row(
           children: [
@@ -15,20 +17,23 @@ class HomeLogo extends StatelessWidget {
               delay: Duration(milliseconds: 500),
               offset: Offset(-10.0, 0.0),
               child: Container(
-                height: 66.0,
-                padding: EdgeInsets.all(6.0),
+                height: size.height * 0.08,
+                padding: EdgeInsets.all(size.height * 0.002),
                 decoration: BoxDecoration(
-                  border: Border.all(width: 2.0, color: Colors.white),
+                  border: Border.all(width: 3.0, color: Colors.black),
                   color: Colors.transparent,
                   shape: BoxShape.circle,
                 ),
-                child: Image.asset('assets/images/icons/light_icon.png'),
+                child: Image.asset(
+                  'assets/images/icons/light_icon.png',
+                  color: Colors.black,
+                ),
               ),
             ),
-            SizedBox(width: 12.0),
+            SizedBox(width: size.width * 0.025),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 FadeAnimation(
                   duration: Duration(milliseconds: 500),
                   delay: Duration(milliseconds: 750),
@@ -36,11 +41,11 @@ class HomeLogo extends StatelessWidget {
                   child: Text(
                     'IGNITE',
                     style: TextStyle(
-                      letterSpacing: 1.5,
-                      fontSize: 44.0,
+                      letterSpacing: size.width * 0.002,
+                      fontSize: size.height * 0.055,
                       fontFamily: 'BebasNeue',
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                 ),
@@ -51,10 +56,10 @@ class HomeLogo extends StatelessWidget {
                   child: Text(
                     'YOUR PASSION',
                     style: TextStyle(
-                      height: 0.8,
-                      fontSize: 44.0,
+                      height: size.height * 0.0008,
+                      fontSize: size.height * 0.055,
                       fontFamily: 'BebasNeue',
-                      color: Colors.white,
+                      color: Colors.black,
                     ),
                   ),
                 ),

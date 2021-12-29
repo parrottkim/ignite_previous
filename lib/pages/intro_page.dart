@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ignite/pages/sign_in_page.dart';
+import 'package:ignite/pages/get_started_page.dart';
 import 'package:intro_slider/intro_slider.dart';
 import 'package:intro_slider/dot_animation_enum.dart';
 import 'package:intro_slider/slide_object.dart';
@@ -50,8 +50,8 @@ class _IntroPageState extends State<IntroPage> {
 
   void onDonePress() {
     // Back to the first tab
-    Navigator.pushAndRemoveUntil(
-        context, MaterialPageRoute(builder: (_) => SignInPage()), (_) => false);
+    Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (_) => GetStartedPage()), (_) => false);
   }
 
   void onTabChangeCompleted(index) {
