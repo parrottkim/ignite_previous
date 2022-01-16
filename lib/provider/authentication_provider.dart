@@ -56,9 +56,9 @@ class AuthenticationProvider with ChangeNotifier {
   }
 
   // 이메일/비밀번호로 Firebase에 로그인
-  Future<String?> signIn(
+  Future<String> signIn(
       {required String email, required String password}) async {
-    String? errorMessage;
+    String errorMessage = '';
     try {
       final userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);

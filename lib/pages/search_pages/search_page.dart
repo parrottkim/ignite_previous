@@ -35,7 +35,7 @@ class SearchPage extends StatelessWidget {
   Widget _loadingPage() {
     return Scaffold(
       appBar: AppBar(
-        title: Text('동료 찾기'),
+        title: Text('Discover'),
       ),
       body: const Center(
         child: SizedBox(

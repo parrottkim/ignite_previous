@@ -6,6 +6,7 @@ import 'package:ignite/pages/my_pages/notice_page.dart';
 import 'package:ignite/pages/my_pages/registration_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
 import 'package:ignite/services/service.dart';
+import 'package:ignite/widgets/dialog.dart';
 import 'package:local_auth/auth_strings.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:provider/provider.dart';
@@ -58,7 +59,7 @@ class _MyPageState extends State<MyPage> {
           stickyAuth: true);
       // if (isAuthenticated) Navigator.push(context, createRoute(MyInfoPage()));
     } on PlatformException catch (e) {
-      print(e);
+      systemSettingsDialog(context);
     }
 
     if (!mounted) return;

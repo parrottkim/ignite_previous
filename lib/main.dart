@@ -5,6 +5,7 @@ import 'package:ignite/pages/auth_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
 import 'package:ignite/provider/bottom_navigation_provider.dart';
 import 'package:ignite/provider/profile/lol_profile_provider.dart';
+import 'package:ignite/provider/profile/pubg_profile_provider.dart';
 import 'package:ignite/provider/profile_page_provider.dart';
 import 'package:ignite/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BottomNavigationProvider()),
         ChangeNotifierProvider(create: (_) => ProfilePageProvider()),
         ChangeNotifierProvider(create: (_) => LOLProfileProvider()),
+        ChangeNotifierProvider(create: (_) => PUBGProfileProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, value, widget) => MaterialApp(
@@ -36,11 +38,18 @@ class MyApp extends StatelessWidget {
           title: 'Ignite',
           themeMode: value.themeMode,
           theme: ThemeData(
-            primarySwatch: Colors.red,
+            primaryColor: Colors.white,
             colorScheme: ColorScheme.fromSwatch(
               brightness: Brightness.light,
-              primarySwatch: Colors.red,
-              backgroundColor: Color(0xFFEDF2F4),
+              backgroundColor: Colors.white,
+            ).copyWith(
+              primary: Colors.redAccent,
+              secondary: Color(0xFFFF5454),
+            ),
+            appBarTheme: AppBarTheme(
+              elevation: 0.0,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
             ),
             bottomNavigationBarTheme: BottomNavigationBarThemeData(
               unselectedItemColor: const Color(0xFF8D99AE).withOpacity(0.6),
@@ -48,10 +57,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
           darkTheme: ThemeData(
-            primarySwatch: Colors.red,
             colorScheme: ColorScheme.fromSwatch(
               brightness: Brightness.dark,
-              primarySwatch: Colors.red,
+              accentColor: Color(0xFFFF5454),
               backgroundColor: Color(0xFF2B2D42),
             ),
             bottomNavigationBarTheme: BottomNavigationBarThemeData(

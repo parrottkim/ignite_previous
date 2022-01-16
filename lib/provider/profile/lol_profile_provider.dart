@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:ignite/models/profile/lol.dart';
 import 'package:ignite/provider/repositories/lol_repository.dart';
 

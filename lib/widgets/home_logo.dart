@@ -45,7 +45,7 @@ class HomeLogo extends StatelessWidget {
                       fontSize: size.height * 0.055,
                       fontFamily: 'BebasNeue',
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
                 ),

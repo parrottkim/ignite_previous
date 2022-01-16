@@ -44,7 +44,8 @@ class _SignUpPageState extends State<SignUpPage> {
         .get();
 
     List<QueryDocumentSnapshot> documents = result.docs;
-    if (documents.length > 0)
+
+    if (documents.isNotEmpty)
       _isUsernameExists = true;
     else
       _isUsernameExists = false;
@@ -59,7 +60,7 @@ class _SignUpPageState extends State<SignUpPage> {
         .get();
 
     List<QueryDocumentSnapshot> documents = result.docs;
-    if (documents.length > 0)
+    if (documents.isNotEmpty)
       _isEmailExists = true;
     else
       _isEmailExists = false;
@@ -169,439 +170,234 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-      ),
-      body: _bodyContainer(size),
+    return AlertDialog(
+      content: _dialogContent(),
     );
+    // final size = MediaQuery.of(context).size;
+    // return Scaffold(
+    //   extendBodyBehindAppBar: true,
+    //   appBar: AppBar(
+    //     elevation: 0,
+    //     backgroundColor: Colors.transparent,
+    //   ),
+    //   body: _bodyContainer(size),
+    // );
   }
 
-  AppBar _appBar() {
-    return AppBar(
-      elevation: 0.0,
-      backgroundColor: Colors.transparent,
-      foregroundColor: Theme.of(context).primaryColor,
-      title: Text(
-        'Sign Up',
-      ),
-    );
-  }
-
-  Widget _bodyContainer(Size size) {
-    return Stack(
-      clipBehavior: Clip.none,
-      alignment: AlignmentDirectional.topCenter,
-      fit: StackFit.loose,
-      children: [
-        Image.asset('assets/images/sign/sign.png'),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-              height: size.height * 0.7,
-              width: size.width,
-              padding: EdgeInsets.symmetric(vertical: 60.0, horizontal: 30.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(20.0),
+  Widget _dialogContent() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Sign up',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontFamily: 'BarlowSemiCondensed',
+                  fontSize: 26.0,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Sign Up',
-                    style: TextStyle(
-                      fontSize: 30.0,
-                      fontWeight: FontWeight.bold,
+            ),
+            SizedBox(height: 20.0),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                border: new Border(
+                  bottom: new BorderSide(
+                      color: Theme.of(context).colorScheme.secondary),
+                ),
+              ),
+              child: TextField(
+                controller: _usernameController,
+                focusNode: _usernameFocusNode,
+                decoration: InputDecoration(
+                  fillColor: Theme.of(context).colorScheme.secondary,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                  labelText: 'Username',
+                  icon: Icon(
+                    Icons.person,
+                  ),
+                  // prefix: Icon(icon),
+                  border: InputBorder.none,
+                  errorText: _isUsernameEditing
+                      ? _validateUsername(_usernameController.text)
+                      : null,
+                  errorStyle: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  suffixIcon:
+                      (_validateUsername(_usernameController.text) != null)
+                          ? Icon(Icons.clear, color: Colors.red[900])
+                          : Icon(Icons.check, color: Colors.green),
+                ),
+                onChanged: (value) async {
+                  await _checkUsernameExists(value);
+                  setState(() {
+                    _isUsernameEditing = true;
+                  });
+                },
+                onSubmitted: (value) {
+                  _usernameFocusNode.unfocus();
+                  FocusScope.of(context).requestFocus(_emailFocusNode);
+                },
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                  border: new Border(
+                      bottom: new BorderSide(
+                          color: Theme.of(context).colorScheme.secondary))),
+              child: TextField(
+                controller: _emailController,
+                focusNode: _emailFocusNode,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  fillColor: Theme.of(context).colorScheme.secondary,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                  labelText: 'Email',
+                  icon: Icon(
+                    Icons.email,
+                  ),
+                  // prefix: Icon(icon),
+                  border: InputBorder.none,
+                  errorText: _isEmailEditing
+                      ? _validateEmail(_emailController.text)
+                      : null,
+                  errorStyle: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.secondary),
+                  suffixIcon: (_validateEmail(_emailController.text) != null)
+                      ? Icon(Icons.clear, color: Colors.red[900])
+                      : Icon(Icons.check, color: Colors.green),
+                ),
+                onChanged: (value) async {
+                  await _checkEmailExists(value);
+                  setState(() {
+                    _isEmailEditing = true;
+                  });
+                },
+                onSubmitted: (value) {
+                  _emailFocusNode.unfocus();
+                  FocusScope.of(context).requestFocus(_passwordFocusNode);
+                },
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                  border: new Border(
+                      bottom: new BorderSide(
+                          color: Theme.of(context).colorScheme.secondary))),
+              child: TextField(
+                  controller: _passwordController,
+                  focusNode: _passwordFocusNode,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    fillColor: Theme.of(context).colorScheme.secondary,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                    labelText: 'Password',
+                    icon: Icon(
+                      Icons.lock,
                     ),
-                  ),
-                  SizedBox(height: 40.0),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                        border: new Border(
-                            bottom: new BorderSide(color: Colors.redAccent))),
-                    child: TextField(
-                      controller: _usernameController,
-                      focusNode: _usernameFocusNode,
-                      decoration: InputDecoration(
-                        fillColor: Colors.redAccent,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        labelText: 'Username',
-                        icon: Icon(
-                          Icons.person,
-                        ),
-                        // prefix: Icon(icon),
-                        border: InputBorder.none,
-                        errorText: _isUsernameEditing
-                            ? _validateUsername(_usernameController.text)
-                            : null,
-                        errorStyle: TextStyle(
-                          fontSize: 12,
-                          color: Colors.redAccent,
-                        ),
-                        suffixIcon:
-                            (_validateUsername(_usernameController.text) !=
-                                    null)
-                                ? Icon(Icons.clear, color: Colors.red[900])
-                                : Icon(Icons.check, color: Colors.green),
-                      ),
-                      onChanged: (value) async {
-                        await _checkUsernameExists(value);
-                        setState(() {
-                          _isUsernameEditing = true;
-                        });
-                      },
-                      onSubmitted: (value) {
-                        _usernameFocusNode.unfocus();
-                        FocusScope.of(context).requestFocus(_emailFocusNode);
-                      },
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                        border: new Border(
-                            bottom: new BorderSide(color: Colors.redAccent))),
-                    child: TextField(
-                      controller: _emailController,
-                      focusNode: _emailFocusNode,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        fillColor: Colors.redAccent,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                        labelText: 'Email',
-                        icon: Icon(
-                          Icons.email,
-                        ),
-                        // prefix: Icon(icon),
-                        border: InputBorder.none,
-                        errorText: _isEmailEditing
-                            ? _validateEmail(_emailController.text)
-                            : null,
-                        errorStyle:
-                            TextStyle(fontSize: 12, color: Colors.redAccent),
-                        suffixIcon:
-                            (_validateEmail(_emailController.text) != null)
-                                ? Icon(Icons.clear, color: Colors.red[900])
-                                : Icon(Icons.check, color: Colors.green),
-                      ),
-                      onChanged: (value) async {
-                        await _checkEmailExists(value);
-                        setState(() {
-                          _isEmailEditing = true;
-                        });
-                      },
-                      onSubmitted: (value) {
-                        _emailFocusNode.unfocus();
-                        FocusScope.of(context).requestFocus(_passwordFocusNode);
-                      },
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                        border: new Border(
-                            bottom: new BorderSide(color: Colors.redAccent))),
-                    child: TextField(
-                        controller: _passwordController,
-                        focusNode: _passwordFocusNode,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          fillColor: Colors.redAccent,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                          labelText: 'Password',
-                          icon: Icon(
-                            Icons.lock,
-                          ),
-                          // prefix: Icon(icon),
-                          border: InputBorder.none,
-                          errorText: _isPasswordEditing
-                              ? _validatePassword(_passwordController.text)
-                              : null,
-                          errorStyle:
-                              TextStyle(fontSize: 12, color: Colors.redAccent),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            _isPasswordEditing = true;
-                          });
-                        },
-                        onSubmitted: (value) {
-                          _passwordFocusNode.unfocus();
-                          FocusScope.of(context)
-                              .requestFocus(_confirmFocusNode);
-                        }),
-                  ),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                        border: new Border(
-                            bottom: new BorderSide(color: Colors.redAccent))),
-                    child: TextField(
-                        controller: _confirmController,
-                        focusNode: _confirmFocusNode,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          fillColor: Colors.redAccent,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                          labelText: 'Confirm Password',
-                          icon: Icon(
-                            Icons.lock,
-                          ),
-                          // prefix: Icon(icon),
-                          border: InputBorder.none,
-                          errorText: _isConfirmEditing
-                              ? _validateConfirm(_confirmController.text)
-                              : null,
-                          errorStyle:
-                              TextStyle(fontSize: 12, color: Colors.redAccent),
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            _isConfirmEditing = true;
-                          });
-                        },
-                        onSubmitted: (value) {
-                          _confirmFocusNode.unfocus();
-                          signUpRequest();
-                        }),
-                  ),
-                  SizedBox(height: 15.0),
-                  signupStatus != null
-                      ? Center(
-                          child: Text(signupStatus,
-                              style: TextStyle(
-                                  color: signupStringColor, fontSize: 14.0)))
-                      : Container(),
-                  SizedBox(height: 15.0),
-                  MaterialButton(
-                    elevation: 0,
-                    minWidth: double.maxFinite,
-                    height: 50,
-                    onPressed: (_validateUsername(_usernameController.text) ==
-                                null &&
-                            _validateEmail(_emailController.text) == null &&
-                            _validatePassword(_passwordController.text) ==
-                                null &&
-                            _validateConfirm(_confirmController.text) == null)
-                        ? () {
-                            setState(() {
-                              _usernameFocusNode.unfocus();
-                              _emailFocusNode.unfocus();
-                              _passwordFocusNode.unfocus();
-                              _confirmFocusNode.unfocus();
-                            });
-                            signUpRequest();
-                          }
+                    // prefix: Icon(icon),
+                    border: InputBorder.none,
+                    errorText: _isPasswordEditing
+                        ? _validatePassword(_passwordController.text)
                         : null,
-                    color: Theme.of(context).primaryColor,
-                    disabledColor: Colors.grey[350],
-                    child: Text('Sign Up',
-                        style: TextStyle(color: Colors.white, fontSize: 16)),
-                    textColor: Colors.white,
+                    errorStyle: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.secondary),
                   ),
-                ],
-              )),
+                  onChanged: (value) {
+                    setState(() {
+                      _isPasswordEditing = true;
+                    });
+                  },
+                  onSubmitted: (value) {
+                    _passwordFocusNode.unfocus();
+                    FocusScope.of(context).requestFocus(_confirmFocusNode);
+                  }),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                  border: new Border(
+                      bottom: new BorderSide(
+                          color: Theme.of(context).colorScheme.secondary))),
+              child: TextField(
+                  controller: _confirmController,
+                  focusNode: _confirmFocusNode,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    fillColor: Theme.of(context).colorScheme.secondary,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                    labelText: 'Confirm Password',
+                    icon: Icon(
+                      Icons.lock,
+                    ),
+                    // prefix: Icon(icon),
+                    border: InputBorder.none,
+                    errorText: _isConfirmEditing
+                        ? _validateConfirm(_confirmController.text)
+                        : null,
+                    errorStyle: TextStyle(
+                        fontSize: 12,
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _isConfirmEditing = true;
+                    });
+                  },
+                  onSubmitted: (value) {
+                    _confirmFocusNode.unfocus();
+                    signUpRequest();
+                  }),
+            ),
+            SizedBox(height: 15.0),
+            signupStatus != null
+                ? Center(
+                    child: Text(signupStatus,
+                        style: TextStyle(
+                            color: signupStringColor, fontSize: 14.0)))
+                : Container(),
+            SizedBox(height: 15.0),
+            MaterialButton(
+              elevation: 0.0,
+              minWidth: double.maxFinite,
+              height: 50,
+              onPressed: (_validateUsername(_usernameController.text) == null &&
+                      _validateEmail(_emailController.text) == null &&
+                      _validatePassword(_passwordController.text) == null &&
+                      _validateConfirm(_confirmController.text) == null)
+                  ? () {
+                      setState(() {
+                        _usernameFocusNode.unfocus();
+                        _emailFocusNode.unfocus();
+                        _passwordFocusNode.unfocus();
+                        _confirmFocusNode.unfocus();
+                      });
+                      signUpRequest();
+                    }
+                  : null,
+              color: Theme.of(context).colorScheme.secondary,
+              disabledColor: Colors.grey[350],
+              child: Text(
+                'Sign Up',
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+              textColor: Colors.white,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
-
-  // Widget _bodyContainer() {
-  //   return Container(
-  //     alignment: Alignment.center,
-  //     margin: EdgeInsets.symmetric(horizontal: 30),
-  //     child: SingleChildScrollView(
-  //       child: Column(
-  //         children: <Widget>[
-  //           Container(
-  //             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-  //             decoration: BoxDecoration(
-  //                 border: new Border(
-  //                     bottom: new BorderSide(color: Colors.redAccent))),
-  //             child: TextField(
-  //               controller: _usernameController,
-  //               focusNode: _usernameFocusNode,
-  //               decoration: InputDecoration(
-  //                 fillColor: Colors.redAccent,
-  //                 contentPadding: EdgeInsets.symmetric(horizontal: 10),
-  //                 labelText: 'Username',
-  //                 icon: Icon(
-  //                   Icons.person,
-  //                 ),
-  //                 // prefix: Icon(icon),
-  //                 border: InputBorder.none,
-  //                 errorText: _isUsernameEditing
-  //                     ? _validateUsername(_usernameController.text)
-  //                     : null,
-  //                 errorStyle: TextStyle(
-  //                   fontSize: 12,
-  //                   color: Colors.redAccent,
-  //                 ),
-  //                 suffixIcon:
-  //                     (_validateUsername(_usernameController.text) != null)
-  //                         ? Icon(Icons.clear, color: Colors.red[900])
-  //                         : Icon(Icons.check, color: Colors.green),
-  //               ),
-  //               onChanged: (value) async {
-  //                 await _checkUsernameExists(value);
-  //                 setState(() {
-  //                   _isUsernameEditing = true;
-  //                 });
-  //               },
-  //               onSubmitted: (value) {
-  //                 _usernameFocusNode.unfocus();
-  //                 FocusScope.of(context).requestFocus(_emailFocusNode);
-  //               },
-  //             ),
-  //           ),
-  //           Container(
-  //             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-  //             decoration: BoxDecoration(
-  //                 border: new Border(
-  //                     bottom: new BorderSide(color: Colors.redAccent))),
-  //             child: TextField(
-  //               controller: _emailController,
-  //               focusNode: _emailFocusNode,
-  //               keyboardType: TextInputType.emailAddress,
-  //               decoration: InputDecoration(
-  //                 fillColor: Colors.redAccent,
-  //                 contentPadding: EdgeInsets.symmetric(horizontal: 10),
-  //                 labelText: 'Email',
-  //                 icon: Icon(
-  //                   Icons.email,
-  //                 ),
-  //                 // prefix: Icon(icon),
-  //                 border: InputBorder.none,
-  //                 errorText: _isEmailEditing
-  //                     ? _validateEmail(_emailController.text)
-  //                     : null,
-  //                 errorStyle: TextStyle(fontSize: 12, color: Colors.redAccent),
-  //                 suffixIcon: (_validateEmail(_emailController.text) != null)
-  //                     ? Icon(Icons.clear, color: Colors.red[900])
-  //                     : Icon(Icons.check, color: Colors.green),
-  //               ),
-  //               onChanged: (value) async {
-  //                 await _checkEmailExists(value);
-  //                 setState(() {
-  //                   _isEmailEditing = true;
-  //                 });
-  //               },
-  //               onSubmitted: (value) {
-  //                 _emailFocusNode.unfocus();
-  //                 FocusScope.of(context).requestFocus(_passwordFocusNode);
-  //               },
-  //             ),
-  //           ),
-  //           Container(
-  //             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-  //             decoration: BoxDecoration(
-  //                 border: new Border(
-  //                     bottom: new BorderSide(color: Colors.redAccent))),
-  //             child: TextField(
-  //                 controller: _passwordController,
-  //                 focusNode: _passwordFocusNode,
-  //                 obscureText: true,
-  //                 decoration: InputDecoration(
-  //                   fillColor: Colors.redAccent,
-  //                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-  //                   labelText: 'Password',
-  //                   icon: Icon(
-  //                     Icons.lock,
-  //                   ),
-  //                   // prefix: Icon(icon),
-  //                   border: InputBorder.none,
-  //                   errorText: _isPasswordEditing
-  //                       ? _validatePassword(_passwordController.text)
-  //                       : null,
-  //                   errorStyle:
-  //                       TextStyle(fontSize: 12, color: Colors.redAccent),
-  //                 ),
-  //                 onChanged: (value) {
-  //                   setState(() {
-  //                     _isPasswordEditing = true;
-  //                   });
-  //                 },
-  //                 onSubmitted: (value) {
-  //                   _passwordFocusNode.unfocus();
-  //                   FocusScope.of(context).requestFocus(_confirmFocusNode);
-  //                 }),
-  //           ),
-  //           Container(
-  //             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-  //             decoration: BoxDecoration(
-  //                 border: new Border(
-  //                     bottom: new BorderSide(color: Colors.redAccent))),
-  //             child: TextField(
-  //                 controller: _confirmController,
-  //                 focusNode: _confirmFocusNode,
-  //                 obscureText: true,
-  //                 decoration: InputDecoration(
-  //                   fillColor: Colors.redAccent,
-  //                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
-  //                   labelText: 'Confirm Password',
-  //                   icon: Icon(
-  //                     Icons.lock,
-  //                   ),
-  //                   // prefix: Icon(icon),
-  //                   border: InputBorder.none,
-  //                   errorText: _isConfirmEditing
-  //                       ? _validateConfirm(_confirmController.text)
-  //                       : null,
-  //                   errorStyle:
-  //                       TextStyle(fontSize: 12, color: Colors.redAccent),
-  //                 ),
-  //                 onChanged: (value) {
-  //                   setState(() {
-  //                     _isConfirmEditing = true;
-  //                   });
-  //                 },
-  //                 onSubmitted: (value) {
-  //                   _confirmFocusNode.unfocus();
-  //                   signUpRequest();
-  //                 }),
-  //           ),
-  //           SizedBox(height: 15.0),
-  //           signupStatus != null
-  //               ? Center(
-  //                   child: Text(signupStatus,
-  //                       style: TextStyle(
-  //                           color: signupStringColor, fontSize: 14.0)))
-  //               : Container(),
-  //           SizedBox(height: 15.0),
-  //           MaterialButton(
-  //             elevation: 0,
-  //             minWidth: double.maxFinite,
-  //             height: 50,
-  //             onPressed: (_validateUsername(_usernameController.text) == null &&
-  //                     _validateEmail(_emailController.text) == null &&
-  //                     _validatePassword(_passwordController.text) == null &&
-  //                     _validateConfirm(_confirmController.text) == null)
-  //                 ? () {
-  //                     setState(() {
-  //                       _usernameFocusNode.unfocus();
-  //                       _emailFocusNode.unfocus();
-  //                       _passwordFocusNode.unfocus();
-  //                       _confirmFocusNode.unfocus();
-  //                     });
-  //                     signUpRequest();
-  //                   }
-  //                 : null,
-  //             color: Theme.of(context).primaryColor,
-  //             disabledColor: Colors.grey[350],
-  //             child: Text('Sign Up',
-  //                 style: TextStyle(color: Colors.white, fontSize: 16)),
-  //             textColor: Colors.white,
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }

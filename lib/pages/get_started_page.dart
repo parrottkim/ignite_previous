@@ -151,12 +151,13 @@ class _GetStartedPageState extends State<GetStartedPage> {
         width: MediaQuery.of(context).size.width,
         height: 50,
         child: MaterialButton(
-          onPressed: () => Navigator.push(context, createRoute(SignInPage())),
+          onPressed: () =>
+              showDialog(context: context, builder: (_) => SignInPage()),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-          color: Theme.of(context).primaryColor,
+          color: Theme.of(context).colorScheme.secondary,
           child: Text(
-            'Sign In',
+            'Sign in',
             style: TextStyle(color: Colors.white, fontSize: 16.0),
           ),
         ),
@@ -173,7 +174,8 @@ class _GetStartedPageState extends State<GetStartedPage> {
         width: MediaQuery.of(context).size.width,
         height: 50,
         child: MaterialButton(
-          onPressed: () => Navigator.push(context, createRoute(SignUpPage())),
+          onPressed: () =>
+              showDialog(context: context, builder: (_) => SignUpPage()),
           padding: const EdgeInsets.all(0.0),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
@@ -194,7 +196,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
                   minWidth: double.maxFinite, minHeight: 50.0),
               alignment: Alignment.center,
               child: Text(
-                'Sign Up',
+                'Sign up',
                 style: TextStyle(color: Colors.white, fontSize: 16.0),
               ),
             ),

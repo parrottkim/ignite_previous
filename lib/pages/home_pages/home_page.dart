@@ -69,45 +69,15 @@ class _HomePageState extends State<HomePage> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: CustomScrollView(
-        physics: NeverScrollableScrollPhysics(),
-        slivers: [
-          _appBarWidget(size),
-          SliverFillRemaining(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 26.0),
-              child: Column(
-                children: [
-                  _updateList(1250),
-                  SizedBox(height: 30.0),
-                  _proSettings(1500),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      // body: SingleChildScrollView(
-      //   padding: EdgeInsets.symmetric(vertical: 30.0, horizontal: 26.0),
-      //   child: Column(
-      //     children: [
-      //       _updateList(1250),
-      //       SizedBox(height: 30.0),
-      //       _proSettings(1500),
-      //     ],
-      //   ),
-      // ),
+      extendBodyBehindAppBar: true,
+      appBar: _appBarWidget(size),
+      body: _bodyContainer(size),
     );
   }
 
-  SliverAppBar _appBarWidget(Size size) {
-    return SliverAppBar(
-      floating: false,
-      pinned: true,
-      snap: false,
-      elevation: 0.0,
-      expandedHeight: size.height * 0.35,
-      foregroundColor: Colors.black,
+  AppBar _appBarWidget(Size size) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
       title: Text(
         'Hello, ${_authenticationProvider.currentUser!.displayName}!',
         style: TextStyle(
@@ -117,45 +87,67 @@ class _HomePageState extends State<HomePage> {
       ),
       actions: [
         IconButton(
-          icon: Icon(Icons.notifications_outlined),
+          splashRadius: 28.0,
           onPressed: () {},
+          icon: Icon(Icons.notifications_none),
         ),
         FutureBuilder(
-            future: firestore
-                .collection('user')
-                .doc(_authenticationProvider.currentUser!.uid)
-                .get(),
-            builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-              return snapshot.hasData
-                  ? CircleAvatar(
-                      backgroundImage: NetworkImage(snapshot.data!['avatar']))
-                  : Container();
-            }),
-        SizedBox(width: 14.0),
+          future: firestore
+              .collection('user')
+              .doc(_authenticationProvider.currentUser!.uid)
+              .get(),
+          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            return snapshot.hasData
+                ? IconButton(
+                    splashRadius: 28.0,
+                    onPressed: () {},
+                    icon: CircleAvatar(
+                      backgroundImage: NetworkImage(
+                        snapshot.data!['avatar'],
+                      ),
+                    ),
+                  )
+                : SizedBox();
+          },
+        ),
+        SizedBox(width: 8.0),
       ],
-      flexibleSpace: FlexibleSpaceBar(
-        centerTitle: true,
-        background: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              fit: BoxFit.cover,
-              image: AssetImage(
-                'assets/images/main/background.png',
-              ),
-            ),
-          ),
-          child: Column(
-            children: [
-              Expanded(
-                child: Container(
-                  alignment: Alignment.bottomCenter,
-                  padding: EdgeInsets.only(top: 50.0, left: 20.0),
-                  child: HomeLogo(size: size),
-                ),
-              ),
-            ],
+    );
+  }
+
+  Widget _bodyContainer(Size size) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _mainBanner(size),
+          _updateList(1250),
+          _proSettings(1500),
+        ],
+      ),
+    );
+  }
+
+  Widget _mainBanner(Size size) {
+    return Container(
+      height: size.height * 0.37,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          fit: BoxFit.cover,
+          image: AssetImage(
+            'assets/images/main/background.png',
           ),
         ),
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              padding: EdgeInsets.only(top: 50.0, left: 20.0),
+              child: HomeLogo(size: size),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -236,97 +228,104 @@ class _HomePageState extends State<HomePage> {
       ),
     ];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        FadeAnimation(
-          duration: Duration(milliseconds: 500),
-          delay: Duration(milliseconds: duration),
-          offset: Offset(-10.0, 0.0),
-          child: Text(
-            'News',
-            style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-          ),
-        ),
-        SizedBox(height: 10.0),
-        FadeAnimation(
-          duration: Duration(milliseconds: 500),
-          delay: Duration(milliseconds: duration),
-          offset: Offset(-10.0, 0.0),
-          child: SizedBox(
-            height: 200,
-            child: PageView.builder(
-              itemCount: 3,
-              controller: _pageController,
-              onPageChanged: (index) => setState(() => _index = index),
-              itemBuilder: (context, index) {
-                return swiper[index];
-              },
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 26.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FadeAnimation(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: duration),
+            offset: Offset(-10.0, 0.0),
+            child: Text(
+              'News',
+              style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
             ),
           ),
-        ),
-      ],
+          SizedBox(height: 10.0),
+          FadeAnimation(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: duration),
+            offset: Offset(-10.0, 0.0),
+            child: SizedBox(
+              height: 200,
+              child: PageView.builder(
+                itemCount: 3,
+                controller: _pageController,
+                onPageChanged: (index) => setState(() => _index = index),
+                itemBuilder: (context, index) {
+                  return swiper[index];
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _proSettings(int duration) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        FadeAnimation(
-          duration: Duration(milliseconds: 500),
-          delay: Duration(milliseconds: duration),
-          offset: Offset(10.0, 0.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Pro settings',
-                style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-              ),
-              InkWell(
-                onTap: () {},
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
-                  child: Text(
-                    'see details >',
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 26.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          FadeAnimation(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: duration),
+            offset: Offset(10.0, 0.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Pro settings',
+                  style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
+                ),
+                InkWell(
+                  onTap: () {},
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+                    child: Text(
+                      'see details >',
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        SizedBox(height: 10.0),
-        FadeAnimation(
-          duration: Duration(milliseconds: 500),
-          delay: Duration(milliseconds: duration),
-          offset: Offset(10.0, 0.0),
-          child: Card(
-            elevation: 4.0,
-            child: InkWell(
-              customBorder: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: ListTile(
-                onTap: () {},
-                minVerticalPadding: 20.0,
-                leading: Icon(Icons.person, size: 60.0),
-                title: Text(
-                  'Faker',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+          SizedBox(height: 10.0),
+          FadeAnimation(
+            duration: Duration(milliseconds: 500),
+            delay: Duration(milliseconds: duration),
+            offset: Offset(10.0, 0.0),
+            child: Card(
+              elevation: 4.0,
+              child: InkWell(
+                customBorder: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Monitor   BenQ XL2430T'),
-                    Text('Mouse     CORSAIR SABRE'),
-                  ],
+                child: ListTile(
+                  onTap: () {},
+                  minVerticalPadding: 20.0,
+                  leading: Icon(Icons.person, size: 60.0),
+                  title: Text(
+                    'Faker',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Monitor   BenQ XL2430T'),
+                      Text('Mouse     CORSAIR SABRE'),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
