@@ -9,9 +9,14 @@ import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
 
 class DetailPostPage extends StatefulWidget {
-  final QueryDocumentSnapshot<Object> snapshot;
+  final QueryDocumentSnapshot<Object> data;
+  final AsyncSnapshot<DocumentSnapshot> snapshot;
   final String game;
-  DetailPostPage({Key? key, required this.snapshot, required this.game})
+  DetailPostPage(
+      {Key? key,
+      required this.data,
+      required this.snapshot,
+      required this.game})
       : super(key: key);
 
   @override
@@ -55,7 +60,7 @@ class _DetailPostPageState extends State<DetailPostPage> {
       'isPrivate': true,
       'members': [
         _authenticationProvider.currentUser!.uid,
-        widget.snapshot['user']
+        widget.data['user']
       ],
       'recentMessage': {
         'messageText': '',
@@ -79,14 +84,12 @@ class _DetailPostPageState extends State<DetailPostPage> {
 
     await firestore
         .collection('chatgroup')
-        .where('members', arrayContains: widget.snapshot['user'])
+        .where('members', arrayContains: widget.data['user'])
         .get()
         .then((value) async {
       value.docs.forEach((element) async {
-        if (unorderedEquality(element.data()['members'], [
-          _authenticationProvider.currentUser!.uid,
-          widget.snapshot['user']
-        ])) {
+        if (unorderedEquality(element.data()['members'],
+            [_authenticationProvider.currentUser!.uid, widget.data['user']])) {
           ChatUser? chatMember = await _getChatMembers(element['members']);
           Navigator.push(
               context,
@@ -141,45 +144,44 @@ class _DetailPostPageState extends State<DetailPostPage> {
 
   AppBar _appBar() {
     return AppBar(
-      title: Text('게시물 보기'),
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(60.0),
-        child: Container(
-          padding: EdgeInsets.only(left: 10.0, bottom: 10.0),
-          height: 60.0,
-          alignment: Alignment.centerLeft,
-          child: Row(
-            children: <Widget>[
-              FloatingActionButton(
-                onPressed: null,
-                child: Padding(
-                  padding: EdgeInsets.all(2.0),
-                  child: _imageLoaded
-                      ? _images['lol']
-                      : CircularProgressIndicator(),
-                ),
-              ),
-              SizedBox(width: 10.0),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    widget.snapshot['title'],
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                  Text(widget.snapshot['content'],
-                      style: TextStyle(color: Colors.white)),
-                ],
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+        // title: Text('게시물 보기'),
+        // bottom: PreferredSize(
+        //   preferredSize: Size.fromHeight(60.0),
+        //   child: Container(
+        //     padding: EdgeInsets.only(left: 10.0, bottom: 10.0),
+        //     height: 60.0,
+        //     alignment: Alignment.centerLeft,
+        //     child: Row(
+        //       children: <Widget>[
+        //         FloatingActionButton(
+        //           onPressed: null,
+        //           child: Padding(
+        //             padding: EdgeInsets.all(2.0),
+        //             child: _imageLoaded
+        //                 ? _images['lol']
+        //                 : CircularProgressIndicator(),
+        //           ),
+        //         ),
+        //         SizedBox(width: 10.0),
+        //         Column(
+        //           mainAxisAlignment: MainAxisAlignment.center,
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           children: <Widget>[
+        //             Text(
+        //               widget.data['title'],
+        //               style: TextStyle(
+        //                 fontSize: 18.0,
+        //                 fontWeight: FontWeight.bold,
+        //               ),
+        //             ),
+        //             Text(widget.data['content']),
+        //           ],
+        //         )
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        );
   }
 
   Widget _bodyContainer() {
@@ -190,6 +192,11 @@ class _DetailPostPageState extends State<DetailPostPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
+              '작성자 계정',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            _userInformation(),
+            Text(
               '주 포지션',
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
@@ -198,17 +205,12 @@ class _DetailPostPageState extends State<DetailPostPage> {
                   alignment: Alignment.centerLeft,
                   width: 30.0,
                   child: Image.asset(
-                      'assets/images/game_icons/lol_lanes/${widget.snapshot['lane']}.png',
+                      'assets/images/game_icons/lol_lanes/${widget.data['lane']}.png',
                       fit: BoxFit.contain)),
-              title: Text(widget.snapshot['lane']),
+              title: Text(widget.data['lane']),
             ),
             Divider(height: 1.0),
             SizedBox(height: 20.0),
-            Text(
-              '작성자 계정',
-              style: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            _userInformation(),
             _userReputation(),
           ],
         ),
@@ -217,7 +219,7 @@ class _DetailPostPageState extends State<DetailPostPage> {
   }
 
   Widget? _floatingActionButton() {
-    return widget.snapshot['user'] != _authenticationProvider.currentUser!.uid
+    return widget.data['user'] != _authenticationProvider.currentUser!.uid
         ? FloatingActionButton(
             heroTag: null,
             onPressed: () async {
@@ -229,50 +231,31 @@ class _DetailPostPageState extends State<DetailPostPage> {
   }
 
   Widget _userInformation() {
-    return FutureBuilder(
-      future: firestore
-          .collection('user')
-          .doc(widget.snapshot['user'])
-          .collection('accounts')
-          .doc(widget.game)
-          .get(),
-      builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-        if (snapshot.hasData) {
-          return ListTile(
-            leading: CircleAvatar(
-                backgroundImage: NetworkImage(
-                    'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${snapshot.data!['profileIconId']}.png'),
-                child: Text('${snapshot.data!['summonerLevel']}',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
-            title: Text(snapshot.data!['name'],
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: snapshot.data!['soloTier'] != null &&
-                    snapshot.data!['soloRank'] != null
-                ? Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                            text:
-                                '${snapshot.data!['soloTier']} ${snapshot.data!['soloRank']}',
-                            style: TextStyle(fontWeight: FontWeight.w500)),
-                        TextSpan(text: ' | '),
-                        TextSpan(
-                            text: '${snapshot.data!['soloLeaguePoints']}LP',
-                            style: TextStyle(fontWeight: FontWeight.w500)),
-                      ],
-                    ),
-                  )
-                : Text('UNRANKED',
-                    style: TextStyle(fontWeight: FontWeight.w500)),
-          );
-        }
-
-        return Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            child: Center(child: CircularProgressIndicator()));
-      },
+    return ListTile(
+      leading: CircleAvatar(
+          backgroundImage: NetworkImage(
+              'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${widget.snapshot.data!['profileIconId']}.png'),
+          child: Text('${widget.snapshot.data!['summonerLevel']}',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+      title: Text(widget.snapshot.data!['name'],
+          style: TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: widget.snapshot.data!['soloTier'] != null &&
+              widget.snapshot.data!['soloRank'] != null
+          ? Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                      text:
+                          '${widget.snapshot.data!['soloTier']} ${widget.snapshot.data!['soloRank']}',
+                      style: TextStyle(fontWeight: FontWeight.w500)),
+                  TextSpan(text: ' | '),
+                  TextSpan(
+                      text: '${widget.snapshot.data!['soloLeaguePoints']}LP',
+                      style: TextStyle(fontWeight: FontWeight.w500)),
+                ],
+              ),
+            )
+          : Text('UNRANKED', style: TextStyle(fontWeight: FontWeight.w500)),
     );
   }
 

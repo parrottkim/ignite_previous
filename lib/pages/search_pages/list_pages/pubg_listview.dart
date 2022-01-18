@@ -49,7 +49,7 @@ class _PUBGListViewState extends State<PUBGListView> {
     );
   }
 
-  Widget _items(AsyncSnapshot<dynamic> snapshot, String user, int index) {
+  Widget _items(AsyncSnapshot<dynamic> data, String user, int index) {
     return FutureBuilder(
       future: firestore
           .collection('user')
@@ -65,7 +65,10 @@ class _PUBGListViewState extends State<PUBGListView> {
               onTap: () => Navigator.push(
                 context,
                 createRoute(
-                  DetailPostPage(snapshot: snapshot.data![index], game: 'pubg'),
+                  DetailPostPage(
+                      data: data.data.docs[index],
+                      snapshot: snapshot,
+                      game: 'pubg'),
                 ),
               ),
               child: Container(
@@ -73,68 +76,167 @@ class _PUBGListViewState extends State<PUBGListView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                            height: 20.0,
-                            width: 20.0,
-                            child: CircleAvatar(
-                              backgroundImage: NetworkImage(
-                                  'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${snapshot.data!['profileIconId']}.png'),
-                            ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // SizedBox(
+                        //   height: 20.0,
+                        //   width: 20.0,
+                        //   child: CircleAvatar(
+                        //     backgroundImage: NetworkImage(
+                        //         'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${snapshot.data!['profileIconId']}.png'),
+                        //   ),
+                        // ),
+                        // SizedBox(width: 8.0),
+                        Text(
+                          snapshot.data!['name'],
+                          style: TextStyle(
+                            fontWeight: FontWeight.w300,
+                            fontSize: 14.0,
                           ),
-                          SizedBox(width: 8.0),
-                          Text(
-                            snapshot.data!['name'],
-                            style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                              fontSize: 14.0,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 7.0),
+                    Divider(height: 1.0),
+                    SizedBox(height: 7.0),
+                    Text(
+                      data.data!.docs[index]['title'],
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 2.0),
+                    Text(data.data!.docs[index]['content']),
+                    SizedBox(height: 10.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _pubgTypeWidgets(data.data!.docs[index]['type']),
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 4.0, horizontal: 8.0),
+                              decoration: BoxDecoration(
+                                  gradient: _pubgTierColors(
+                                      snapshot.data!['squadTier']),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 4,
+                                    ),
+                                  ]),
+                              child: snapshot.data!['squadTier'] != null
+                                  ? Text(
+                                      '${snapshot.data!['squadTier']} ${snapshot.data!['squadRank']}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10.0,
+                                      ),
+                                    )
+                                  : Text(
+                                      'UNRANKED',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10.0,
+                                      ),
+                                    ),
                             ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                            vertical: 4.0, horizontal: 8.0),
-                        decoration: BoxDecoration(
-                            // gradient:
-                            //     _pubgTierColors(snapshot.data!['soloTier']),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(20.0),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 2,
-                                blurRadius: 4,
-                              ),
-                            ]),
-                        child: snapshot.data!['soloTier'] != null
-                            ? Text(
-                                '${snapshot.data!['soloTier']} ${snapshot.data!['soloRank']}',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10.0,
-                                ),
-                              )
-                            : Text(
-                                'UNRANKED',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10.0,
-                                ),
-                              ),
-                      ),
-                    ])
+                          ],
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ),
           );
         } else
-          return Center(child: CircularProgressIndicator());
+          return SizedBox();
       },
     );
+  }
+
+  LinearGradient? _pubgTierColors(String? tier) {
+    switch (tier) {
+      case 'Bronze':
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color(0xFF4F1C0D),
+            Color(0xFFA96A40),
+          ],
+        );
+      case 'Silver':
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color(0xFF848482),
+            Color(0xFFB0C4DE),
+          ],
+        );
+      case 'Gold':
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color(0xFFDA9100),
+            Color(0xFFFCC201),
+          ],
+        );
+      case 'Platinum':
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color(0xFF209BBA),
+            Color(0xFFA8D8DF),
+          ],
+        );
+      case 'Diamond':
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color(0xFF4467C4),
+            Color(0xFF8EC3E6),
+          ],
+        );
+      case 'Master':
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color(0xFF7BC1FA),
+            Color(0xFFFCC201),
+          ],
+        );
+      case null:
+        return const LinearGradient(
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+          colors: [
+            Color(0xFF104730),
+            Color(0xFF6D9775),
+          ],
+        );
+    }
+  }
+
+  Widget _pubgTypeWidgets(String type) {
+    switch (type) {
+      case 'duo':
+        return Icon(Icons.looks_two);
+      case 'squad':
+        return Icon(Icons.looks_4);
+      default:
+        return SizedBox();
+    }
   }
 }

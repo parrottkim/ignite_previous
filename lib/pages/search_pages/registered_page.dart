@@ -91,6 +91,13 @@ class _RegisteredPageState extends State<RegisteredPage> {
       elevation: 0.0,
       backgroundColor: Theme.of(context).primaryColor,
       title: Text('Discover'),
+      actions: [
+        IconButton(
+          splashRadius: 28.0,
+          onPressed: () {},
+          icon: Icon(Icons.filter_list),
+        ),
+      ],
       bottom: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
         child: Container(

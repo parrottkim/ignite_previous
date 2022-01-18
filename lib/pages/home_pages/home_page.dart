@@ -120,6 +120,7 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           _mainBanner(size),
+          SizedBox(height: 10.0),
           _updateList(1250),
           _proSettings(1500),
         ],

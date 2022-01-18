@@ -65,74 +65,39 @@ class _LOLListViewState extends State<LOLListView> {
               onTap: () => Navigator.push(
                 context,
                 createRoute(
-                  DetailPostPage(snapshot: snapshot.data![index], game: 'lol'),
+                  DetailPostPage(
+                      data: data.data.docs[index],
+                      snapshot: snapshot,
+                      game: 'lol'),
                 ),
               ),
               child: Container(
-                padding: EdgeInsets.all(14.0),
+                padding: EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            SizedBox(
-                              height: 20.0,
-                              width: 20.0,
-                              child: CircleAvatar(
-                                backgroundImage: NetworkImage(
-                                    'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${snapshot.data!['profileIconId']}.png'),
-                              ),
-                            ),
-                            SizedBox(width: 8.0),
-                            Text(
-                              snapshot.data!['name'],
-                              style: TextStyle(
-                                fontWeight: FontWeight.w300,
-                                fontSize: 14.0,
-                              ),
-                            ),
-                          ],
+                        SizedBox(
+                          height: 20.0,
+                          width: 20.0,
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${snapshot.data!['profileIconId']}.png'),
+                          ),
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 4.0, horizontal: 8.0),
-                          decoration: BoxDecoration(
-                              gradient:
-                                  _lolTierColors(snapshot.data!['soloTier']),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20.0),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 2,
-                                  blurRadius: 4,
-                                ),
-                              ]),
-                          child: snapshot.data!['soloTier'] != null
-                              ? Text(
-                                  '${snapshot.data!['soloTier']} ${snapshot.data!['soloRank']}',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10.0,
-                                  ),
-                                )
-                              : Text(
-                                  'UNRANKED',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10.0,
-                                  ),
-                                ),
+                        SizedBox(width: 8.0),
+                        Text(
+                          snapshot.data!['name'],
+                          style: TextStyle(
+                            fontSize: 14.0,
+                          ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 10.0),
-                    Divider(height: 1.0, color: Colors.grey),
-                    SizedBox(height: 10.0),
+                    SizedBox(height: 7.0),
+                    Divider(height: 1.0),
+                    SizedBox(height: 7.0),
                     Text(
                       data.data!.docs[index]['title'],
                       style: TextStyle(
@@ -140,13 +105,69 @@ class _LOLListViewState extends State<LOLListView> {
                     ),
                     SizedBox(height: 2.0),
                     Text(data.data!.docs[index]['content']),
+                    SizedBox(height: 10.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            _lolTypeWidgets(data.data!.docs[index]['type']),
+                            SizedBox(width: 4.0),
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              width: 20.0,
+                              child: Image.asset(
+                                  "assets/images/game_icons/lol_lanes/${data.data!.docs[index].data()["lane"]}.png",
+                                  fit: BoxFit.contain),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 4.0, horizontal: 8.0),
+                              decoration: BoxDecoration(
+                                  gradient: _lolTierColors(
+                                      snapshot.data!['soloTier']),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 4,
+                                    ),
+                                  ]),
+                              child: snapshot.data!['soloTier'] != null
+                                  ? Text(
+                                      '${snapshot.data!['soloTier']} ${snapshot.data!['soloRank']}',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10.0,
+                                      ),
+                                    )
+                                  : Text(
+                                      'UNRANKED',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10.0,
+                                      ),
+                                    ),
+                            ),
+                            SizedBox(width: 4.0),
+                          ],
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ),
           );
         } else
-          return Center(child: CircularProgressIndicator());
+          return SizedBox();
       },
     );
   }
@@ -243,6 +264,17 @@ class _LOLListViewState extends State<LOLListView> {
             Color(0xFF6D9775),
           ],
         );
+    }
+  }
+
+  Widget _lolTypeWidgets(String type) {
+    switch (type) {
+      case 'duo':
+        return Icon(Icons.looks_two);
+      case 'flex':
+        return Icon(Icons.looks_5);
+      default:
+        return Icon(Icons.account_box_rounded);
     }
   }
 }
