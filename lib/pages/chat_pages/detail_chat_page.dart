@@ -10,7 +10,7 @@ import 'package:collection/collection.dart';
 class DetailChatPage extends StatefulWidget {
   final ChatUser chatMember;
   final String chatgroupId;
-  DetailChatPage(
+  const DetailChatPage(
       {Key? key, required this.chatMember, required this.chatgroupId})
       : super(key: key);
 
@@ -29,7 +29,7 @@ class _DetailChatPageState extends State<DetailChatPage> {
 
   String _getDetailDate(DateTime dateTime) {
     DateTime now = DateTime.now();
-    DateTime justNow = now.subtract(Duration(minutes: 1));
+    DateTime justNow = now.subtract(Duration(seconds: 30));
     DateTime localDateTime = dateTime.toLocal();
     if (!localDateTime.difference(justNow).isNegative) {
       return 'Just now';
@@ -316,9 +316,7 @@ class _DetailChatPageState extends State<DetailChatPage> {
                 .orderBy('sentAt', descending: true)
                 .snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              _changeReadStatus().then((_) {
-                if (mounted) setState(() {});
-              });
+              _changeReadStatus().then((_) {});
 
               if (!snapshot.hasData) {
                 return SizedBox(

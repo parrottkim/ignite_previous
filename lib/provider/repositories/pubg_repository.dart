@@ -21,7 +21,6 @@ class PUBGRepository {
       for (var season in seasons) {
         // 현재 활성화된 시즌 찾아서 리턴
         if (season['attributes']['isCurrentSeason'] == true) {
-          print(season['id']);
           return season['id'];
         }
       }
@@ -54,7 +53,6 @@ class PUBGRepository {
       final Map<String, dynamic> userData = jsonDecode(response.body);
       final Map<String, dynamic> rankData =
           userData['data']['attributes']['rankedGameModeStats'];
-      print(rankData);
       return PUBGUser.fromJson(userInfo, rankData);
     } else
       return null;

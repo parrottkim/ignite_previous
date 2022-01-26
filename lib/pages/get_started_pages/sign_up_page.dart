@@ -258,6 +258,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 controller: _emailController,
                 focusNode: _emailFocusNode,
                 keyboardType: TextInputType.emailAddress,
+                autofillHints: [AutofillHints.email],
                 decoration: InputDecoration(
                   fillColor: Theme.of(context).colorScheme.secondary,
                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
@@ -298,6 +299,8 @@ class _SignUpPageState extends State<SignUpPage> {
               child: TextField(
                   controller: _passwordController,
                   focusNode: _passwordFocusNode,
+                  keyboardType: TextInputType.text,
+                  autofillHints: [AutofillHints.password],
                   obscureText: true,
                   decoration: InputDecoration(
                     fillColor: Theme.of(context).colorScheme.secondary,

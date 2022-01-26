@@ -37,6 +37,7 @@ dependencies:
   local_auth: ^1.1.9
   image_picker: ^0.7.4
   video_player: ^2.2.10
+  shimmer: ^2.0.0
 
   google_sign_in: ^5.2.1
   firebase_core: ^1.10.0

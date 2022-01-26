@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:http/http.dart' as http;
 import 'package:ignite/models/profile/lol.dart';
@@ -23,11 +24,13 @@ class LOLRepository {
     );
     if (response.statusCode == 200) {
       final Map<String, dynamic> body = jsonDecode(response.body);
-      return await getUserData(body);
+      return body;
     }
   }
 
-  Future getUserData(Map<String, dynamic> userData) async {
+  Future getUserData(String username) async {
+    final userData = await getUserName(username);
+    if (userData == null) return null;
     final url =
         'https://kr.api.riotgames.com/lol/league/v4/entries/by-summoner/' +
             userData['id'];
@@ -46,5 +49,33 @@ class LOLRepository {
     } else {
       return null;
     }
+  }
+
+  Future getMostChampion(String username) async {
+    final userData = await getUserName(username);
+    if (userData == null) return null;
+    final url =
+        'https://kr.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-summoner/' +
+            userData['id'];
+    final response = await http.get(
+      Uri.parse(url),
+      headers: headers,
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> body = jsonDecode(response.body);
+      return body.first['championId'].toString();
+    }
+  }
+
+  Future getUserMastery(String username) async {
+    final String most = await getMostChampion(username);
+    final response = await http.get(Uri.parse(
+        'http://ddragon.leagueoflegends.com/cdn/12.1.1/data/en_US/champion.json'));
+    final List<dynamic> body = [];
+    jsonDecode(response.body)['data'].forEach((key, value) {
+      body.add(value);
+    });
+    final item = body.firstWhere((e) => e['key'] == most);
+    return item['id'];
   }
 }

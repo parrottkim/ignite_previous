@@ -53,6 +53,11 @@ class PUBGUser {
         squadRank: rankData["squad"]["currentTier"]["subTier"],
         squadPoints: rankData["squad"]["currentRankPoint"],
       );
+    } else if (rankData.isEmpty) {
+      return PUBGUser(
+        accountId: userInfo.first["id"],
+        name: userInfo.first["attributes"]["name"],
+      );
     } else
       return PUBGUser();
   }

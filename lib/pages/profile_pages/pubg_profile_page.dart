@@ -314,12 +314,17 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
                     : null,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0)),
-                color: _searching
-                    ? Colors.transparent
-                    : Theme.of(context).colorScheme.primary,
+                color: _pubgProfileProvider.pubgUser != null
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
                 child: Text(
                   'Confirm',
-                  style: TextStyle(color: Colors.white, fontSize: 16.0),
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: _pubgProfileProvider.pubgUser != null
+                        ? Colors.white
+                        : Colors.transparent,
+                  ),
                 ),
               ),
             ),

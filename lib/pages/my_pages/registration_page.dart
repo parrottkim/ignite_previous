@@ -83,9 +83,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.symmetric(horizontal: 16.0),
-      child: FutureBuilder(
+      child: FutureBuilder<QuerySnapshot>(
         future: firestore.collection('gamelist').orderBy('rank').get(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        builder: (context, snapshot) {
           if (!snapshot.hasData) return CircularProgressWidget();
 
           return GridView.builder(
@@ -107,26 +107,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(0.0),
                   onTap: () {
-                    // Navigator.of(context).push(
-                    //   MaterialPageRoute(
-                    //     builder: (context) => MultiProvider(
-                    //       providers: [
-                    //         ChangeNotifierProvider(
-                    //             create: (_) =>
-                    //                 AuthenticationProvider(
-                    //                     FirebaseAuth.instance)),
-                    //         ChangeNotifierProvider(
-                    //             create: (_) =>
-                    //                 LOLProfileProvider()),
-                    //       ],
-                    //       child: _profilePageProvider.getPage(
-                    //         snapshot.data.docs[index]
-                    //             .data()['name'],
-                    //       ),
-                    //     ),
-                    //   ),
-                    // );
-
                     Navigator.push(
                         context,
                         createRoute(_profilePageProvider

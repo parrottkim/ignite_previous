@@ -66,26 +66,6 @@ class _RegisteredPageState extends State<RegisteredPage> {
     );
   }
 
-  Widget radioButton(QuerySnapshot<dynamic> snapshot, int index) {
-    return SizedBox(
-      width: 50.0,
-      height: 50.0,
-      child: MaterialButton(
-        padding: EdgeInsets.all(4.0),
-        color: _selectedIndex == index ? Colors.white : Colors.white60,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-        onPressed: () {
-          changeRadioButtonIndex(index);
-          setState(() {
-            _boardId = snapshot.docs[index].id;
-          });
-        },
-        child: _images[snapshot.docs[index].id],
-      ),
-    );
-  }
-
   AppBar _appBar() {
     return AppBar(
       elevation: 0.0,
@@ -110,7 +90,7 @@ class _RegisteredPageState extends State<RegisteredPage> {
             scrollDirection: Axis.horizontal,
             itemCount: widget.snapshot.docs.length,
             itemBuilder: (context, index) {
-              return radioButton(widget.snapshot, index);
+              return _radioButton(widget.snapshot, index);
             },
             separatorBuilder: (context, index) {
               return SizedBox(width: 4.0);
@@ -128,6 +108,26 @@ class _RegisteredPageState extends State<RegisteredPage> {
       return PUBGListView();
     else
       return Center(child: CircularProgressIndicator());
+  }
+
+  Widget _radioButton(QuerySnapshot<dynamic> snapshot, int index) {
+    return SizedBox(
+      width: 50.0,
+      height: 50.0,
+      child: MaterialButton(
+        padding: EdgeInsets.all(4.0),
+        color: _selectedIndex == index ? Colors.white : Colors.white60,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+        onPressed: () {
+          changeRadioButtonIndex(index);
+          setState(() {
+            _boardId = snapshot.docs[index].id;
+          });
+        },
+        child: _images[snapshot.docs[index].id],
+      ),
+    );
   }
 
   Widget _floatingActionButton() {

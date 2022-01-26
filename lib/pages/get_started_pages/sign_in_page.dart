@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ignite/pages/dashboard_page.dart';
-import 'package:ignite/pages/sign_up_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
 import 'package:ignite/provider/bottom_navigation_provider.dart';
-import 'package:ignite/services/service.dart';
 import 'package:ignite/widgets/dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -147,6 +145,7 @@ class _SignInPageState extends State<SignInPage> {
               controller: _emailController,
               focusNode: _emailFocusNode,
               keyboardType: TextInputType.emailAddress,
+              autofillHints: [AutofillHints.email],
               decoration: InputDecoration(
                   fillColor: Theme.of(context).colorScheme.secondary,
                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
@@ -173,6 +172,8 @@ class _SignInPageState extends State<SignInPage> {
             child: TextField(
               controller: _passwordController,
               focusNode: _passwordFocusNode,
+              keyboardType: TextInputType.text,
+              autofillHints: [AutofillHints.password],
               obscureText: true,
               decoration: InputDecoration(
                   fillColor: Theme.of(context).colorScheme.secondary,
@@ -289,7 +290,7 @@ class _SignInPageState extends State<SignInPage> {
         },
         child: Text(
           'Forgot Password?',
-          style: TextStyle(color: Theme.of(context).primaryColor),
+          style: TextStyle(color: Theme.of(context).colorScheme.primary),
         ),
       ),
     );

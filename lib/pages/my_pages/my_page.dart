@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ignite/pages/get_started_page.dart';
+import 'package:ignite/pages/get_started_pages/get_started_page.dart';
 import 'package:ignite/pages/my_pages/my_info_page.dart';
 import 'package:ignite/pages/my_pages/notice_page.dart';
 import 'package:ignite/pages/my_pages/registration_page.dart';

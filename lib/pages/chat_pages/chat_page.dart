@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class ChatPage extends StatefulWidget {
-  ChatPage({Key? key}) : super(key: key);
+  const ChatPage({Key? key}) : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -22,7 +22,7 @@ class _ChatPageState extends State<ChatPage> {
 
   String _getDetailDate(DateTime dateTime) {
     DateTime now = DateTime.now();
-    DateTime justNow = now.subtract(Duration(minutes: 1));
+    DateTime justNow = now.subtract(Duration(seconds: 30));
     DateTime localDateTime = dateTime.toLocal();
     if (!localDateTime.difference(justNow).isNegative) {
       return 'Just now';
@@ -124,7 +124,7 @@ class _ChatPageState extends State<ChatPage> {
                       height: 20.0,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Theme.of(context).primaryColor),
+                          color: Theme.of(context).colorScheme.primary),
                       child: Align(
                         alignment: Alignment.center,
                         child: Text(
@@ -164,47 +164,45 @@ class _ChatPageState extends State<ChatPage> {
     return Consumer<AuthenticationProvider>(
       builder: (context, value, child) {
         if (value.currentUser != null) {
-          return Container(
-            child: StreamBuilder(
-                stream: firestore
-                    .collection('chatgroup')
-                    .where('members', arrayContains: value.currentUser!.uid)
-                    .orderBy('modifiedAt', descending: true)
-                    .snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasData) {
-                    return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
-                      itemBuilder: (context, index) {
-                        return AnimationConfiguration.staggeredList(
-                          position: index,
-                          duration: const Duration(milliseconds: 375),
-                          child: SlideAnimation(
-                            verticalOffset: 50.0,
-                            child: FadeInAnimation(
-                              child: FutureBuilder(
-                                future: _getChatMembers(value,
-                                    snapshot.data!.docs[index]['members']),
-                                builder: (context,
-                                    AsyncSnapshot<ChatUser?> subSnapshot) {
-                                  if (subSnapshot.hasData) {
-                                    return _loadItems(
-                                        value,
-                                        snapshot.data!.docs[index],
-                                        subSnapshot.data!);
-                                  } else
-                                    return SizedBox();
-                                },
-                              ),
+          return StreamBuilder<QuerySnapshot>(
+              stream: firestore
+                  .collection('chatgroup')
+                  .where('members', arrayContains: value.currentUser!.uid)
+                  .orderBy('modifiedAt', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return ListView.builder(
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      return AnimationConfiguration.staggeredList(
+                        position: index,
+                        duration: const Duration(milliseconds: 375),
+                        child: SlideAnimation(
+                          verticalOffset: 50.0,
+                          child: FadeInAnimation(
+                            child: FutureBuilder(
+                              future: _getChatMembers(
+                                  value, snapshot.data!.docs[index]['members']),
+                              builder: (context,
+                                  AsyncSnapshot<ChatUser?> subSnapshot) {
+                                if (subSnapshot.hasData) {
+                                  return _loadItems(
+                                      value,
+                                      snapshot.data!.docs[index],
+                                      subSnapshot.data!);
+                                } else
+                                  return SizedBox();
+                              },
                             ),
                           ),
-                        );
-                      },
-                    );
-                  } else
-                    return CircularProgressWidget();
-                }),
-          );
+                        ),
+                      );
+                    },
+                  );
+                } else
+                  return CircularProgressWidget();
+              });
         } else
           return CircularProgressWidget();
       },

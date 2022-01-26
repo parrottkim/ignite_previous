@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:ignite/pages/search_pages/detail_post_page.dart';
+import 'package:ignite/pages/search_pages/detail_pages/lol_detail_page.dart';
 import 'package:ignite/services/service.dart';
 
 class PUBGListView extends StatefulWidget {
@@ -18,13 +18,12 @@ class _PUBGListViewState extends State<PUBGListView> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
+    return StreamBuilder<QuerySnapshot>(
       stream: firestore
           .collection('board')
           .where('game', isEqualTo: 'pubg')
           .snapshots(),
-      builder: (context,
-          AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+      builder: (context, snapshot) {
         if (snapshot.hasData) {
           return ListView.builder(
             padding: EdgeInsets.symmetric(vertical: 10.0),
@@ -62,15 +61,15 @@ class _PUBGListViewState extends State<PUBGListView> {
           return Card(
             margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             child: InkWell(
-              onTap: () => Navigator.push(
-                context,
-                createRoute(
-                  DetailPostPage(
-                      data: data.data.docs[index],
-                      snapshot: snapshot,
-                      game: 'pubg'),
-                ),
-              ),
+              // onTap: () => Navigator.push(
+              //   context,
+              //   createRoute(
+              //     DetailPostPage(
+              //         data: data.data.docs[index],
+              //         snapshot: snapshot,
+              //         game: 'pubg'),
+              //   ),
+              // ),
               child: Container(
                 padding: EdgeInsets.all(14.0),
                 child: Column(

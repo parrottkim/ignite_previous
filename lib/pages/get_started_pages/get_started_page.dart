@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ignite/animations/fade_animations.dart';
-import 'package:ignite/pages/sign_in_page.dart';
-import 'package:ignite/pages/sign_up_page.dart';
+import 'package:ignite/pages/get_started_pages/sign_in_page.dart';
+import 'package:ignite/pages/get_started_pages/sign_up_page.dart';
 import 'package:ignite/services/service.dart';
 import 'package:video_player/video_player.dart';
 

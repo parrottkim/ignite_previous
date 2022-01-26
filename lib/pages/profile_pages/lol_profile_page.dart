@@ -240,7 +240,7 @@ class _LOLProfilePageState extends State<LOLProfilePage>
                 alignment: Alignment.center,
                 height: _searching
                     ? 0.0
-                    : MediaQuery.of(context).size.height * 0.7 -
+                    : MediaQuery.of(context).size.height * 0.65 -
                         MediaQuery.of(context).viewInsets.bottom,
                 padding: EdgeInsets.symmetric(vertical: 10),
                 child: _lolProfileProvider.lolUser != null
@@ -268,12 +268,17 @@ class _LOLProfilePageState extends State<LOLProfilePage>
                     : null,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10.0)),
-                color: _searching
-                    ? Colors.transparent
-                    : Theme.of(context).colorScheme.primary,
+                color: _lolProfileProvider.lolUser != null
+                    ? Theme.of(context).colorScheme.primary
+                    : Colors.transparent,
                 child: Text(
                   'Confirm',
-                  style: TextStyle(color: Colors.white, fontSize: 16.0),
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: _lolProfileProvider.lolUser != null
+                        ? Colors.white
+                        : Colors.transparent,
+                  ),
                 ),
               ),
             ),

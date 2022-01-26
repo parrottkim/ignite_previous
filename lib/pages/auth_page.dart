@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ignite/pages/dashboard_page.dart';
-import 'package:ignite/pages/get_started_page.dart';
-import 'package:ignite/pages/intro_page.dart';
+import 'package:ignite/pages/get_started_pages/get_started_page.dart';
+import 'package:ignite/pages/get_started_pages/intro_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';

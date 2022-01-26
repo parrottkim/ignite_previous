@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'package:ignite/pages/search_pages/detail_post_page.dart';
+import 'package:ignite/pages/search_pages/detail_pages/lol_detail_page.dart';
+import 'package:ignite/provider/profile/lol_profile_provider.dart';
 import 'package:ignite/services/service.dart';
+import 'package:provider/provider.dart';
 
 class LOLListView extends StatefulWidget {
   LOLListView({Key? key}) : super(key: key);
@@ -13,8 +15,17 @@ class LOLListView extends StatefulWidget {
 }
 
 class _LOLListViewState extends State<LOLListView> {
+  late LOLProfileProvider _lolProfileProvider;
+
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _lolProfileProvider =
+        Provider.of<LOLProfileProvider>(context, listen: false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,14 +61,14 @@ class _LOLListViewState extends State<LOLListView> {
   }
 
   Widget _items(AsyncSnapshot<dynamic> data, String user, int index) {
-    return FutureBuilder(
+    return FutureBuilder<DocumentSnapshot>(
       future: firestore
           .collection('user')
           .doc(user)
           .collection('accounts')
           .doc('lol')
           .get(),
-      builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+      builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Card(
             margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
@@ -65,7 +76,7 @@ class _LOLListViewState extends State<LOLListView> {
               onTap: () => Navigator.push(
                 context,
                 createRoute(
-                  DetailPostPage(
+                  LOLDetailPage(
                       data: data.data.docs[index],
                       snapshot: snapshot,
                       game: 'lol'),
@@ -104,7 +115,11 @@ class _LOLListViewState extends State<LOLListView> {
                           fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 2.0),
-                    Text(data.data!.docs[index]['content']),
+                    Text(
+                      data.data!.docs[index]['content'],
+                      maxLines: 2,
+                      overflow: TextOverflow.fade,
+                    ),
                     SizedBox(height: 10.0),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

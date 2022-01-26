@@ -91,12 +91,12 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {},
           icon: Icon(Icons.notifications_none),
         ),
-        FutureBuilder(
+        FutureBuilder<DocumentSnapshot>(
           future: firestore
               .collection('user')
               .doc(_authenticationProvider.currentUser!.uid)
               .get(),
-          builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+          builder: (context, snapshot) {
             return snapshot.hasData
                 ? IconButton(
                     splashRadius: 28.0,
