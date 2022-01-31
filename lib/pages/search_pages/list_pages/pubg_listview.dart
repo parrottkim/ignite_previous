@@ -75,30 +75,6 @@ class _PUBGListViewState extends State<PUBGListView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // SizedBox(
-                        //   height: 20.0,
-                        //   width: 20.0,
-                        //   child: CircleAvatar(
-                        //     backgroundImage: NetworkImage(
-                        //         'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${snapshot.data!['profileIconId']}.png'),
-                        //   ),
-                        // ),
-                        // SizedBox(width: 8.0),
-                        Text(
-                          snapshot.data!['name'],
-                          style: TextStyle(
-                            fontWeight: FontWeight.w300,
-                            fontSize: 14.0,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 7.0),
-                    Divider(height: 1.0),
-                    SizedBox(height: 7.0),
                     Text(
                       data.data!.docs[index]['title'],
                       style: TextStyle(
@@ -106,47 +82,104 @@ class _PUBGListViewState extends State<PUBGListView> {
                     ),
                     SizedBox(height: 2.0),
                     Text(data.data!.docs[index]['content']),
-                    SizedBox(height: 10.0),
+                    SizedBox(height: 14.0),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _pubgTypeWidgets(data.data!.docs[index]['type']),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 8.0),
+                          decoration: BoxDecoration(
+                              gradient:
+                                  _pubgTierColors(snapshot.data!['squadTier']),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20.0),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 4,
+                                ),
+                              ]),
+                          child: snapshot.data!['squadTier'] != null
+                              ? Text(
+                                  '${snapshot.data!['squadTier']} ${snapshot.data!['squadRank']}',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10.0,
+                                  ),
+                                )
+                              : Text(
+                                  'UNRANKED',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10.0,
+                                  ),
+                                ),
+                        ),
+                        SizedBox(width: 6.0),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 4.0, horizontal: 8.0),
+                          width: 80.0,
+                          decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topRight,
+                                end: Alignment.bottomLeft,
+                                colors: [
+                                  Color(0xFF2B2D42),
+                                  Color(0xFF8D99AE),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(20.0),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 2,
+                                  blurRadius: 4,
+                                ),
+                              ]),
+                          child: Text(
+                            _pubgTypeWidgets(data.data!.docs[index]['type']),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 14.0),
+                    Divider(height: 1.0),
+                    SizedBox(height: 14.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
                         Row(
                           children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                  vertical: 4.0, horizontal: 8.0),
-                              decoration: BoxDecoration(
-                                  gradient: _pubgTierColors(
-                                      snapshot.data!['squadTier']),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20.0),
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 4,
-                                    ),
-                                  ]),
-                              child: snapshot.data!['squadTier'] != null
-                                  ? Text(
-                                      '${snapshot.data!['squadTier']} ${snapshot.data!['squadRank']}',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10.0,
-                                      ),
+                            Text(
+                              snapshot.data!['name'],
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15.0,
+                              ),
+                            ),
+                            SizedBox(width: 8.0),
+                            SizedBox(
+                              height: 24.0,
+                              width: 24.0,
+                              child: snapshot.data!['profileImage'] != null
+                                  ? CircleAvatar(
+                                      backgroundImage: NetworkImage(
+                                          snapshot.data!['profileImage']),
                                     )
-                                  : Text(
-                                      'UNRANKED',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10.0,
-                                      ),
-                                    ),
+                                  : CircleAvatar(),
                             ),
                           ],
-                        ),
+                        )
                       ],
                     ),
                   ],
@@ -228,14 +261,22 @@ class _PUBGListViewState extends State<PUBGListView> {
     }
   }
 
-  Widget _pubgTypeWidgets(String type) {
+  String _pubgTypeWidgets(String type) {
     switch (type) {
-      case 'duo':
-        return Icon(Icons.looks_two);
-      case 'squad':
-        return Icon(Icons.looks_4);
+      case 'duos':
+        return 'DUOS';
+      case 'duos-fpp':
+        return 'DUOS FPP';
+      case 'squads':
+        return 'SQUADS';
+      case 'squads-fpp':
+        return 'SQUADS FPP';
+      case 'ranked':
+        return 'RANKED';
+      case 'ranked-fpp':
+        return 'RANKED FPP';
       default:
-        return SizedBox();
+        return '';
     }
   }
 }

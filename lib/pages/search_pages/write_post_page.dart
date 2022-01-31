@@ -101,7 +101,6 @@ class _WritePostPageState extends State<WritePostPage>
 
   AppBar _appBar() {
     return AppBar(
-      elevation: 0.0,
       title: Text('New post'),
     );
   }
@@ -162,26 +161,14 @@ class _WritePostPageState extends State<WritePostPage>
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(fontSize: count <= 2 ? 30 / count : 12.0),
+                style:
+                    TextStyle(fontSize: count <= 2 ? 21.0 - count * 3 : 12.0),
               ),
             ),
           ],
         ),
       ),
     );
-    // return Card(
-    //   margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-    //   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40.0)),
-    //   child: InkWell(
-    //     onTap: () => _navigate(widget.snapshot.docs[index].id),
-    //     borderRadius: BorderRadius.circular(40.0),
-    //     child: ListTile(
-    //       leading: SizedBox(height: 50.0, child: image),
-    //       title: Text(_games[widget.snapshot.docs[index].id]),
-    //       trailing: Icon(Icons.keyboard_arrow_right),
-    //     ),
-    //   ),
-    // );
   }
 
   Widget _radioButton(Image image, int index) {

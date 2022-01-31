@@ -9,7 +9,6 @@ class PUBGProfileProvider extends ChangeNotifier {
 
   loadUserProfile(String username, String server) async {
     _pubgUser = await _pubgRepository.getUserName(username, server);
-    print(_pubgUser);
     notifyListeners();
   }
 

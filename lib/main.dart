@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
           title: 'Ignite',
           themeMode: value.themeMode,
           theme: ThemeData(
+            primarySwatch: Colors.red,
             primaryColor: Colors.white,
             colorScheme: ColorScheme.fromSwatch(
               brightness: Brightness.light,
@@ -48,7 +49,7 @@ class MyApp extends StatelessWidget {
             ),
             appBarTheme: AppBarTheme(
               elevation: 0.0,
-              backgroundColor: Colors.white,
+              backgroundColor: Colors.transparent,
               foregroundColor: Colors.black,
             ),
             bottomNavigationBarTheme: BottomNavigationBarThemeData(
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
           darkTheme: ThemeData(
+            primarySwatch: Colors.red,
             colorScheme: ColorScheme.fromSwatch(
               brightness: Brightness.dark,
               accentColor: Color(0xFFFF5454),

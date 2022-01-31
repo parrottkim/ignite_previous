@@ -157,8 +157,7 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
 
   AppBar _appBar() {
     return AppBar(
-      backgroundColor: Colors.transparent,
-      foregroundColor: Colors.white,
+      foregroundColor: _bannerImage != null ? Colors.white : Colors.black,
     );
   }
 

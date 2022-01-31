@@ -203,9 +203,6 @@ class _SignInPageState extends State<SignInPage> {
               : Container(),
           SizedBox(height: 15.0),
           MaterialButton(
-            elevation: 0.0,
-            minWidth: double.maxFinite,
-            height: 50.0,
             onPressed: () {
               setState(() {
                 _emailFocusNode.unfocus();
@@ -213,6 +210,9 @@ class _SignInPageState extends State<SignInPage> {
               });
               signInRequest();
             },
+            elevation: 0.0,
+            minWidth: double.maxFinite,
+            height: 50.0,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0)),
             color: Theme.of(context).colorScheme.primary,

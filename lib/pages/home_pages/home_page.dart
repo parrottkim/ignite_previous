@@ -77,7 +77,6 @@ class _HomePageState extends State<HomePage> {
 
   AppBar _appBarWidget(Size size) {
     return AppBar(
-      backgroundColor: Colors.transparent,
       title: Text(
         'Hello, ${_authenticationProvider.currentUser!.displayName}!',
         style: TextStyle(

@@ -8,7 +8,9 @@ class NotRegisteredPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('동료 찾기')),
+      appBar: AppBar(
+        title: Text('Discover'),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

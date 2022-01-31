@@ -8,9 +8,32 @@ class PUBGRepository {
     'Authorization': 'Bearer XXXX',
     'Accept': 'application/vnd.api+json'
   };
+  final steamKey = 'XXXX';
+
+  Future getSteamProfile(String username) async {
+    final url =
+        'http://api.steampowered.com/ISteamUser/ResolveVanityURL/v0001/?key=${steamKey}&vanityurl=${username}';
+    final response = await http.get(
+      Uri.parse(url),
+    );
+    if (jsonDecode(response.body)['response']['success'] == 1) {
+      return await getSteamProfileImage(
+          jsonDecode(response.body)['response']['steamid']);
+    } else
+      return null;
+  }
+
+  Future getSteamProfileImage(String steamid) async {
+    final url =
+        'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${steamKey}&steamids=${steamid}';
+    final response = await http.get(
+      Uri.parse(url),
+    );
+    return jsonDecode(response.body)['response']['players'][0]['avatarfull'];
+  }
 
   Future getCurrentSeason() async {
-    final url = 'https://api.pubg.com/shards/steam/seasons';
+    const url = 'https://api.pubg.com/shards/steam/seasons';
     final response = await http.get(
       Uri.parse(url),
       headers: headers,
@@ -38,11 +61,12 @@ class PUBGRepository {
       final Map<String, dynamic> userData = jsonDecode(response.body);
       List userInfo = userData['data'];
       String season = await getCurrentSeason();
-      return await getUserData(season, userInfo, server);
+      return await getUserData(season, userInfo, server, username);
     }
   }
 
-  Future getUserData(String season, List userInfo, String server) async {
+  Future getUserData(
+      String season, List userInfo, String server, String username) async {
     final url =
         'https://api.pubg.com/shards/$server/players/${userInfo.first['id']}/seasons/$season/ranked';
     final response = await http.get(
@@ -50,10 +74,11 @@ class PUBGRepository {
       headers: headers,
     );
     if (response.statusCode == 200) {
+      final profileImage = await getSteamProfile(username);
       final Map<String, dynamic> userData = jsonDecode(response.body);
       final Map<String, dynamic> rankData =
           userData['data']['attributes']['rankedGameModeStats'];
-      return PUBGUser.fromJson(userInfo, rankData);
+      return PUBGUser.fromJson(userInfo, rankData, profileImage);
     } else
       return null;
   }

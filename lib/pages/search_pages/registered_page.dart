@@ -68,8 +68,6 @@ class _RegisteredPageState extends State<RegisteredPage> {
 
   AppBar _appBar() {
     return AppBar(
-      elevation: 0.0,
-      backgroundColor: Theme.of(context).primaryColor,
       title: Text('Discover'),
       actions: [
         IconButton(
@@ -81,7 +79,6 @@ class _RegisteredPageState extends State<RegisteredPage> {
       bottom: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
         child: Container(
-          color: Theme.of(context).primaryColor,
           padding: EdgeInsets.only(left: 10.0, bottom: 10.0),
           height: 60.0,
           alignment: Alignment.centerLeft,

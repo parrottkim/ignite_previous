@@ -46,19 +46,21 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
 
   _addUserDialog(PUBGUser pubgUser) async {
     await firestore
-        .collection("user")
+        .collection('user')
         .doc(_authenticationProvider.currentUser!.uid)
-        .collection("accounts")
-        .doc("pubg")
+        .collection('accounts')
+        .doc('pubg')
         .set({
-      "accountId": pubgUser.accountId,
-      "name": pubgUser.name,
-      "soloTier": pubgUser.soloTier,
-      "soloRank": pubgUser.soloRank,
-      "soloPoints": pubgUser.soloPoints,
-      "squadTier": pubgUser.squadTier,
-      "squadRank": pubgUser.squadRank,
-      "squadPoints": pubgUser.squadPoints,
+      'server': _selectedItem,
+      'accountId': pubgUser.accountId,
+      'name': pubgUser.name,
+      'profileImage': pubgUser.profileImage,
+      'soloTier': pubgUser.soloTier,
+      'soloRank': pubgUser.soloRank,
+      'soloPoints': pubgUser.soloPoints,
+      'squadTier': pubgUser.squadTier,
+      'squadRank': pubgUser.squadRank,
+      'squadPoints': pubgUser.squadPoints,
     }).then((value) async {
       Navigator.pop(context);
       await showDialog(
@@ -66,8 +68,8 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
           barrierDismissible: false,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("등록 완료!"),
-              content: Text("유저 정보가 계정에 추가되었습니다\n수정이나 삭제는 \'내 정보\'에서 가능합니다"),
+              title: Text('등록 완료!'),
+              content: Text('유저 정보가 계정에 추가되었습니다\n수정이나 삭제는 \'내 정보\'에서 가능합니다'),
               actions: [
                 MaterialButton(
                   onPressed: () {
@@ -79,7 +81,7 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
                         (route) => false);
                     _bottomNavigationProvider.updatePage(1);
                   },
-                  child: Text("확인"),
+                  child: Text('확인'),
                 ),
               ],
             );
@@ -90,10 +92,10 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
 
   _addUserData(PUBGUser pubgUser) async {
     await firestore
-        .collection("user")
+        .collection('user')
         .doc(_authenticationProvider.currentUser!.uid)
-        .collection("accounts")
-        .doc("pubg")
+        .collection('accounts')
+        .doc('pubg')
         .get()
         .then((value) async {
       if (value.exists) {
@@ -103,20 +105,20 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
             barrierDismissible: false,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text("어라?"),
-                content: Text("이미 유저 정보가 등록되어 있습니다\n\'네\'를 누르면 기존 정보를 덮어씌웁니다"),
+                title: Text('어라?'),
+                content: Text('이미 유저 정보가 등록되어 있습니다\n\'네\'를 누르면 기존 정보를 덮어씌웁니다'),
                 actions: [
                   MaterialButton(
                     onPressed: () async {
                       _addUserDialog(pubgUser);
                     },
-                    child: Text("네"),
+                    child: Text('네'),
                   ),
                   MaterialButton(
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text("아니오"),
+                    child: Text('아니오'),
                   ),
                 ],
               );
@@ -162,6 +164,7 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
     return Scaffold(
       appBar: AppBar(
         title: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('PUBG'),
@@ -211,7 +214,7 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
               _dropFocusNode.unfocus();
               FocusScope.of(context).requestFocus(_textFocusNode);
             },
-            hint: Text("서버"),
+            hint: Text('서버'),
           ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -337,14 +340,11 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
   Widget _userCard(PUBGUser pubgUser) {
     return Card(
       child: ListTile(
-        // leading: CircleAvatar(
-        //     backgroundImage: NetworkImage(
-        //         'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${pubgUser.profileIconId}.png'),
-        //     child: Text('${pubgUser.summonerLevel}',
-        //         style: TextStyle(
-        //             fontWeight: FontWeight.bold,
-        //             fontSize: 12,
-        //             color: Colors.white))),
+        leading: pubgUser.profileImage != null
+            ? CircleAvatar(
+                backgroundImage: NetworkImage(pubgUser.profileImage!),
+              )
+            : CircleAvatar(),
         title:
             Text(pubgUser.name!, style: TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Column(
