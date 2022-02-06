@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:ignite/models/chat_user.dart';
 import 'package:ignite/pages/chat_pages/detail_chat_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
-import 'package:ignite/provider/profile/lol_profile_provider.dart';
+import 'package:ignite/provider/profile/pubg_profile_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
@@ -12,24 +12,22 @@ import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 
-class LOLDetailPage extends StatefulWidget {
+class PUBGDetailPage extends StatefulWidget {
   final QueryDocumentSnapshot<Object?> data;
   final AsyncSnapshot<DocumentSnapshot> snapshot;
-  LOLDetailPage({Key? key, required this.data, required this.snapshot})
+  PUBGDetailPage({Key? key, required this.data, required this.snapshot})
       : super(key: key);
 
   @override
-  _LOLDetailPageState createState() => _LOLDetailPageState();
+  State<PUBGDetailPage> createState() => _PUBGDetailPageState();
 }
 
-class _LOLDetailPageState extends State<LOLDetailPage> {
+class _PUBGDetailPageState extends State<PUBGDetailPage> {
   late AuthenticationProvider _authenticationProvider;
-  late LOLProfileProvider _lolProfileProvider;
+  late PUBGProfileProvider _pubgProfileProvider;
 
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
-
-  String? _bannerImage;
 
   Future<ChatUser?> _getChatMembers(List<dynamic> members) async {
     ChatUser? chatMember;
@@ -105,20 +103,15 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _lolProfileProvider =
-        Provider.of<LOLProfileProvider>(context, listen: false);
     _authenticationProvider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-
-    _lolProfileProvider.loadUserMastery(widget.snapshot.data!['name']).then(
-        (_) => setState(() => _bannerImage =
-            'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/${_lolProfileProvider.userMastery}_0.jpg'));
+    _pubgProfileProvider =
+        Provider.of<PUBGProfileProvider>(context, listen: false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: _appBar(),
       body: _bodyContainer(),
       floatingActionButton: _floatingActionButton(),
@@ -126,31 +119,26 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
   }
 
   AppBar _appBar() {
-    return AppBar(
-      foregroundColor: _bannerImage != null ? Colors.white : Colors.black,
-    );
+    return AppBar();
   }
 
   Widget _bodyContainer() {
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          _userInformation(),
-          SizedBox(height: 100.0),
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _description(),
-                SizedBox(height: 14.0),
-                Divider(height: 1.0),
-                SizedBox(height: 14.0),
-                _userReputation(),
-              ],
-            ),
-          )
-        ],
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _userInformation(),
+            SizedBox(height: 10.0),
+            SizedBox(height: 20.0),
+            _description(),
+            SizedBox(height: 14.0),
+            Divider(height: 1.0),
+            SizedBox(height: 14.0),
+            _userReputation(),
+          ],
+        ),
       ),
     );
   }
@@ -168,110 +156,76 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
   }
 
   Widget _userInformation() {
-    return Stack(
-      clipBehavior: Clip.none,
+    return Row(
       children: [
-        _bannerImage != null
-            ? Container(
-                height: MediaQuery.of(context).size.height * 0.25,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                      _bannerImage!,
-                    ),
-                  ),
-                ),
+        widget.snapshot.data!['profileImage'] != null
+            ? CircleAvatar(
+                radius: 40.0,
+                backgroundImage:
+                    NetworkImage(widget.snapshot.data!['profileImage']),
               )
-            : SizedBox(
-                height: MediaQuery.of(context).size.height * 0.25,
-                child: Shimmer.fromColors(
-                  child: Container(
-                    color: Colors.white,
-                  ),
-                  baseColor: Colors.grey.withOpacity(0.1),
-                  highlightColor: Colors.grey.withOpacity(0.3),
-                ),
+            : CircleAvatar(
+                radius: 40.0,
               ),
-        Positioned(
-          top: MediaQuery.of(context).size.height * 0.25 - 44.0,
-          left: 20.0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                child: CircleAvatar(
-                  radius: 40.0,
-                  backgroundImage: NetworkImage(
-                      'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${widget.snapshot.data!['profileIconId']}.png'),
-                  child: Text(
-                    '${widget.snapshot.data!['summonerLevel']}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      color: Colors.white,
-                    ),
+        SizedBox(width: 10.0),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  widget.snapshot.data!['name'],
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 22.0,
                   ),
                 ),
-              ),
-              SizedBox(height: 6.0),
-              Row(
-                children: [
-                  Text(
-                    widget.snapshot.data!['name'],
-                    style: TextStyle(
-                      fontWeight: FontWeight.w900,
-                      fontSize: 22.0,
-                    ),
+                SizedBox(width: 4.0),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  width: 20.0,
+                  child: Image.asset(
+                    'assets/images/server_icons/${widget.snapshot.data!['server']}.png',
+                    fit: BoxFit.contain,
                   ),
-                  SizedBox(width: 4.0),
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    width: 20.0,
-                    child: Image.asset(
-                      'assets/images/game_icons/lol_lanes/${widget.data['lane']}.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                ],
-              ),
-              Opacity(
-                opacity: 0.4,
-                child: widget.snapshot.data!['soloTier'] != null &&
-                        widget.snapshot.data!['soloRank'] != null
-                    ? Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text:
-                                  '${widget.snapshot.data!['soloTier']} ${widget.snapshot.data!['soloRank']}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16.0,
-                              ),
+                ),
+              ],
+            ),
+            Opacity(
+              opacity: 0.4,
+              child: widget.snapshot.data!['squadTier'] != null &&
+                      widget.snapshot.data!['squadRank'] != null
+                  ? Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text:
+                                '${widget.snapshot.data!['squadTier']} ${widget.snapshot.data!['squadRank']}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.0,
                             ),
-                            TextSpan(
-                                text: ' | ', style: TextStyle(fontSize: 16.0)),
-                            TextSpan(
-                              text:
-                                  '${widget.snapshot.data!['soloLeaguePoints']}LP',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16.0,
-                              ),
+                          ),
+                          TextSpan(
+                              text: ' | ', style: TextStyle(fontSize: 16.0)),
+                          TextSpan(
+                            text: '${widget.snapshot.data!['squadPoints']}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16.0,
                             ),
-                          ],
-                        ),
-                      )
-                    : Text(
-                        'UNRANKED',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
+                          ),
+                        ],
                       ),
-              ),
-            ],
-          ),
+                    )
+                  : Text(
+                      'UNRANKED',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+            ),
+          ],
         ),
       ],
     );

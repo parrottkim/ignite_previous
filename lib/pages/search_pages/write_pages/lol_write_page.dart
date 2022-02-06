@@ -191,7 +191,7 @@ class _LOLWritePageState extends State<LOLWritePage> {
   Widget _bodyContainer() {
     return SingleChildScrollView(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 26.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -199,70 +199,62 @@ class _LOLWritePageState extends State<LOLWritePage> {
             _userInformation(),
             Divider(height: 1.0),
             SizedBox(height: 20.0),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _queueType(),
-                  SizedBox(width: 30.0),
-                  _mainRole(),
-                ],
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _queueType(),
+                SizedBox(width: 30.0),
+                _mainRole(),
+              ],
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-              child: TextField(
-                controller: _titleController,
-                focusNode: _titleFocusNode,
-                decoration: InputDecoration(
-                    fillColor: Colors.redAccent,
-                    enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.redAccent)),
-                    labelText: 'Title',
-                    errorText: _isTitleEditing
-                        ? _validateText(_titleController.text)
-                        : null),
-                onChanged: (value) {
-                  setState(() {
-                    _isTitleEditing = true;
-                  });
-                },
-                onSubmitted: (value) {
-                  _titleFocusNode.unfocus();
-                  FocusScope.of(context).requestFocus(_contentFocusNode);
-                },
+            TextField(
+              controller: _titleController,
+              focusNode: _titleFocusNode,
+              decoration: InputDecoration(
+                fillColor: Colors.redAccent,
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.redAccent)),
+                labelText: 'Title',
+                errorText: _isTitleEditing
+                    ? _validateText(_titleController.text)
+                    : null,
               ),
+              onChanged: (value) {
+                setState(() {
+                  _isTitleEditing = true;
+                });
+              },
+              onSubmitted: (value) {
+                _titleFocusNode.unfocus();
+                FocusScope.of(context).requestFocus(_contentFocusNode);
+              },
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-              child: TextField(
-                controller: _contentController,
-                focusNode: _contentFocusNode,
-                maxLines: null,
-                maxLength: 140,
-                decoration: InputDecoration(
-                  fillColor: Colors.redAccent,
-                  enabledBorder: new UnderlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.redAccent)),
-                  labelText: 'Content',
-                  errorText: _isContentEditing
-                      ? _validateText(_contentController.text)
-                      : null,
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _isContentEditing = true;
-                  });
-                },
-                onSubmitted: (value) {
-                  _contentFocusNode.unfocus();
-                  if (lolUser != null &&
-                      _validateText(_titleController.text) == null &&
-                      _validateText(_contentController.text) == null &&
-                      _isPositionSelected) _uploadContent();
-                },
+            TextField(
+              controller: _contentController,
+              focusNode: _contentFocusNode,
+              maxLines: null,
+              maxLength: 140,
+              decoration: InputDecoration(
+                fillColor: Colors.redAccent,
+                enabledBorder: new UnderlineInputBorder(
+                    borderSide: new BorderSide(color: Colors.redAccent)),
+                labelText: 'Content',
+                errorText: _isContentEditing
+                    ? _validateText(_contentController.text)
+                    : null,
               ),
+              onChanged: (value) {
+                setState(() {
+                  _isContentEditing = true;
+                });
+              },
+              onSubmitted: (value) {
+                _contentFocusNode.unfocus();
+                if (lolUser != null &&
+                    _validateText(_titleController.text) == null &&
+                    _validateText(_contentController.text) == null &&
+                    _isPositionSelected) _uploadContent();
+              },
             ),
             SizedBox(height: 20.0),
             MaterialButton(

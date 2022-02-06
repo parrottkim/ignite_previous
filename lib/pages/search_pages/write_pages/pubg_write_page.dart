@@ -99,7 +99,7 @@ class _PUBGWritePageState extends State<PUBGWritePage> {
                   });
                   Navigator.pop(context);
                   Navigator.pop(context);
-                  Navigator.pop(context, 0);
+                  Navigator.pop(context, 1);
                 },
                 child: Text('예'),
               ),
@@ -178,7 +178,7 @@ class _PUBGWritePageState extends State<PUBGWritePage> {
   Widget _bodyContainer() {
     return SingleChildScrollView(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 26.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -186,63 +186,55 @@ class _PUBGWritePageState extends State<PUBGWritePage> {
             _userInformation(),
             Divider(height: 1.0),
             SizedBox(height: 20.0),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0),
-              child: _queueType(),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-              child: TextField(
-                controller: _titleController,
-                focusNode: _titleFocusNode,
-                decoration: InputDecoration(
-                    fillColor: Colors.redAccent,
-                    enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.redAccent)),
-                    labelText: 'Title',
-                    errorText: _isTitleEditing
-                        ? _validateText(_titleController.text)
-                        : null),
-                onChanged: (value) {
-                  setState(() {
-                    _isTitleEditing = true;
-                  });
-                },
-                onSubmitted: (value) {
-                  _titleFocusNode.unfocus();
-                  FocusScope.of(context).requestFocus(_contentFocusNode);
-                },
+            _queueType(),
+            TextField(
+              controller: _titleController,
+              focusNode: _titleFocusNode,
+              decoration: InputDecoration(
+                fillColor: Colors.redAccent,
+                enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.redAccent)),
+                labelText: 'Title',
+                errorText: _isTitleEditing
+                    ? _validateText(_titleController.text)
+                    : null,
               ),
+              onChanged: (value) {
+                setState(() {
+                  _isTitleEditing = true;
+                });
+              },
+              onSubmitted: (value) {
+                _titleFocusNode.unfocus();
+                FocusScope.of(context).requestFocus(_contentFocusNode);
+              },
             ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-              child: TextField(
-                controller: _contentController,
-                focusNode: _contentFocusNode,
-                maxLines: null,
-                maxLength: 140,
-                decoration: InputDecoration(
-                  fillColor: Colors.redAccent,
-                  enabledBorder: new UnderlineInputBorder(
-                      borderSide: new BorderSide(color: Colors.redAccent)),
-                  labelText: 'Content',
-                  errorText: _isContentEditing
-                      ? _validateText(_contentController.text)
-                      : null,
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _isContentEditing = true;
-                  });
-                },
-                onSubmitted: (value) {
-                  _contentFocusNode.unfocus();
-                  if (pubgUser != null &&
-                      _validateText(_titleController.text) == null &&
-                      _validateText(_contentController.text) == null)
-                    _uploadContent();
-                },
+            TextField(
+              controller: _contentController,
+              focusNode: _contentFocusNode,
+              maxLines: null,
+              maxLength: 140,
+              decoration: InputDecoration(
+                fillColor: Colors.redAccent,
+                enabledBorder: new UnderlineInputBorder(
+                    borderSide: new BorderSide(color: Colors.redAccent)),
+                labelText: 'Content',
+                errorText: _isContentEditing
+                    ? _validateText(_contentController.text)
+                    : null,
               ),
+              onChanged: (value) {
+                setState(() {
+                  _isContentEditing = true;
+                });
+              },
+              onSubmitted: (value) {
+                _contentFocusNode.unfocus();
+                if (pubgUser != null &&
+                    _validateText(_titleController.text) == null &&
+                    _validateText(_contentController.text) == null)
+                  _uploadContent();
+              },
             ),
             SizedBox(height: 20.0),
             MaterialButton(
@@ -270,7 +262,11 @@ class _PUBGWritePageState extends State<PUBGWritePage> {
   Widget _userInformation() {
     if (pubgUser != null) {
       return ListTile(
-        leading: CircleAvatar(),
+        leading: pubgUser!.profileImage != null
+            ? CircleAvatar(
+                backgroundImage: NetworkImage(pubgUser!.profileImage!),
+              )
+            : CircleAvatar(),
         title: Text(pubgUser!.name!,
             style: TextStyle(fontWeight: FontWeight.bold)),
         subtitle: pubgUser!.squadTier != null && pubgUser!.squadRank != null

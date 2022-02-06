@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:ignite/pages/search_pages/detail_pages/lol_detail_page.dart';
+import 'package:ignite/pages/search_pages/detail_pages/pubg_detail_page.dart';
 import 'package:ignite/services/service.dart';
 
 class PUBGListView extends StatefulWidget {
@@ -16,39 +17,80 @@ class _PUBGListViewState extends State<PUBGListView> {
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
 
+  late String? _selectedType = null;
+
+  late bool _isTypesSelected;
+  final Map<String, String> _types = {
+    'Duos': 'duos',
+    'Duos FPP': 'duos-fpp',
+    'Squads': 'squads',
+    'Squads FPP': 'squads-fpp',
+    'Ranked': 'ranked',
+    'Ranked FPP': 'ranked-fpp'
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _isTypesSelected = false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: firestore
-          .collection('board')
-          .where('game', isEqualTo: 'pubg')
-          .snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return ListView.builder(
-            padding: EdgeInsets.symmetric(vertical: 10.0),
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              return AnimationConfiguration.staggeredList(
-                position: index,
-                duration: const Duration(milliseconds: 500),
-                child: SlideAnimation(
-                  verticalOffset: 50.0,
-                  child: FadeInAnimation(
-                    child: _items(
-                        snapshot, snapshot.data!.docs[index]['user'], index),
-                  ),
-                ),
-              );
-            },
-          );
-        } else
-          return Center(child: CircularProgressIndicator());
-      },
+    return SingleChildScrollView(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _filterButton(),
+            SizedBox(height: 6.0),
+            StreamBuilder<QuerySnapshot<Object?>>(
+              stream: firestore
+                  .collection('board')
+                  .where('game', isEqualTo: 'pubg')
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  List<QueryDocumentSnapshot> items = [];
+                  if (_isTypesSelected && _selectedType != null) {
+                    for (var element in snapshot.data!.docs) {
+                      if (element['type'] == _selectedType) {
+                        items.add(element);
+                      }
+                    }
+                  } else {
+                    items = snapshot.data!.docs.toList();
+                  }
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      return AnimationConfiguration.staggeredList(
+                        position: index,
+                        duration: const Duration(milliseconds: 500),
+                        child: SlideAnimation(
+                          verticalOffset: 50.0,
+                          child: FadeInAnimation(
+                            child: _items(items, items[index]['user'], index),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                } else
+                  return Center(child: CircularProgressIndicator());
+              },
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _items(AsyncSnapshot<dynamic> data, String user, int index) {
+  Widget _items(List<QueryDocumentSnapshot> data, String user, int index) {
     return FutureBuilder(
       future: firestore
           .collection('user')
@@ -59,29 +101,25 @@ class _PUBGListViewState extends State<PUBGListView> {
       builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasData) {
           return Card(
-            margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
             child: InkWell(
-              // onTap: () => Navigator.push(
-              //   context,
-              //   createRoute(
-              //     DetailPostPage(
-              //         data: data.data.docs[index],
-              //         snapshot: snapshot,
-              //         game: 'pubg'),
-              //   ),
-              // ),
+              onTap: () => Navigator.push(
+                context,
+                createRoute(
+                  PUBGDetailPage(data: data[index], snapshot: snapshot),
+                ),
+              ),
               child: Container(
                 padding: EdgeInsets.all(14.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data.data!.docs[index]['title'],
+                      data[index]['title'],
                       style: TextStyle(
                           fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 2.0),
-                    Text(data.data!.docs[index]['content']),
+                    Text(data[index]['content']),
                     SizedBox(height: 14.0),
                     Row(
                       children: [
@@ -142,7 +180,7 @@ class _PUBGListViewState extends State<PUBGListView> {
                                 ),
                               ]),
                           child: Text(
-                            _pubgTypeWidgets(data.data!.docs[index]['type']),
+                            _pubgTypeWidgets(data[index]['type']),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
@@ -190,6 +228,119 @@ class _PUBGListViewState extends State<PUBGListView> {
         } else
           return SizedBox();
       },
+    );
+  }
+
+  _filterDialog(int flag) {
+    return showModalBottomSheet(
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20.0), topRight: Radius.circular(20.0)),
+      ),
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 20.0, horizontal: 26.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Queue type filters',
+                            style: TextStyle(
+                                fontSize: 20.0, fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedType = null;
+                                _isTypesSelected = false;
+                              });
+                              Navigator.of(context).pop();
+                            },
+                            icon: Icon(Icons.refresh),
+                          ),
+                        ],
+                      ),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: _types.length,
+                        itemBuilder: (context, index) {
+                          String key = _types.keys.elementAt(index);
+                          return ListTile(
+                            onTap: () {
+                              setState(() => _isTypesSelected = true);
+                              _selectedType = _types[key];
+                              Navigator.of(context).pop();
+                            },
+                            title: Text(key),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _filterButton() {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.tune, size: 16.0),
+              SizedBox(width: 4.0),
+              Text('Filters', style: TextStyle(fontWeight: FontWeight.w700)),
+            ],
+          ),
+        ),
+        SizedBox(width: 4.0),
+        InkWell(
+          onTap: () async {
+            await _filterDialog(1);
+            setState(() {});
+          },
+          customBorder: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                  width: 0.5,
+                  color: !_isTypesSelected ? Colors.black : Colors.transparent),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              color: !_isTypesSelected ? Colors.transparent : Colors.black,
+            ),
+            child: Text(
+              'Queue type',
+              style: TextStyle(
+                color: !_isTypesSelected ? Colors.black : Colors.white,
+                fontSize: 14.0,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

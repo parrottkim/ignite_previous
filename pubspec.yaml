@@ -36,7 +36,7 @@ dependencies:
   flutter_staggered_animations: ^1.0.0
   local_auth: ^1.1.9
   image_picker: ^0.7.4
-  video_player: ^2.2.10
+  video_player: ^2.2.18
   shimmer: ^2.0.0
 
   google_sign_in: ^5.2.1
@@ -79,6 +79,7 @@ flutter:
     - assets/images/icons/
     - assets/images/game_icons/
     - assets/images/game_icons/lol_lanes/
+    - assets/images/server_icons/
     - assets/images/intro/
     - assets/images/main/
     - assets/videos/
