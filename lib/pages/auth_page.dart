@@ -35,7 +35,8 @@ class _AuthPageState extends State<AuthPage> {
     return Consumer<AuthenticationProvider>(
       builder: (context, value, widget) {
         if (!_firstSeen && value.currentUser == null) return IntroPage();
-        if (value.currentUser == null) return GetStartedPage();
+        if (value.currentUser == null || !value.currentUser!.emailVerified)
+          return GetStartedPage();
         return DashboardPage();
       },
     );

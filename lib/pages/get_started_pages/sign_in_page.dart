@@ -27,6 +27,8 @@ class _SignInPageState extends State<SignInPage> {
   String _loginStatus = '';
   Color _loginStringColor = Colors.green;
 
+  bool _isLoggingIn = false;
+
   void signInRequest() async {
     if (_emailController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty) {
@@ -38,6 +40,7 @@ class _SignInPageState extends State<SignInPage> {
           .then((result) {
         if (result.isEmpty) {
           setState(() {
+            _isLoggingIn = false;
             _loginStatus = 'You have successfully signed in';
             _loginStringColor = Colors.green;
           });
@@ -51,12 +54,14 @@ class _SignInPageState extends State<SignInPage> {
           _bottomNavigationProvider.updatePage(0);
         } else if (result == '이메일 주소 인증이 필요합니다') {
           setState(() {
+            _isLoggingIn = false;
             _loginStatus = result;
             _loginStringColor = Colors.green;
           });
           emailVerificationDialog(context);
         } else {
           setState(() {
+            _isLoggingIn = false;
             _loginStatus = result;
             _loginStringColor = Colors.red;
           });
@@ -64,6 +69,7 @@ class _SignInPageState extends State<SignInPage> {
       });
     } else {
       setState(() {
+        _isLoggingIn = false;
         _loginStatus = 'Please enter email & password';
         _loginStringColor = Colors.red;
       });
@@ -183,10 +189,17 @@ class _SignInPageState extends State<SignInPage> {
                     Icons.lock,
                   ),
                   border: InputBorder.none),
-              onSubmitted: (value) {
-                _passwordFocusNode.unfocus();
-                signInRequest();
-              },
+              onSubmitted: !_isLoggingIn
+                  ? (value) {
+                      setState(() {
+                        _isLoggingIn = true;
+                        _loginStatus = '';
+                        _emailFocusNode.unfocus();
+                        _passwordFocusNode.unfocus();
+                      });
+                      signInRequest();
+                    }
+                  : null,
             ),
           ),
           SizedBox(height: 15),
@@ -203,23 +216,29 @@ class _SignInPageState extends State<SignInPage> {
               : Container(),
           SizedBox(height: 15.0),
           MaterialButton(
-            onPressed: () {
-              setState(() {
-                _emailFocusNode.unfocus();
-                _passwordFocusNode.unfocus();
-              });
-              signInRequest();
-            },
+            onPressed: !_isLoggingIn
+                ? () {
+                    setState(() {
+                      _isLoggingIn = true;
+                      _loginStatus = '';
+                      _emailFocusNode.unfocus();
+                      _passwordFocusNode.unfocus();
+                    });
+                    signInRequest();
+                  }
+                : null,
             elevation: 0.0,
             minWidth: double.maxFinite,
             height: 50.0,
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0)),
             color: Theme.of(context).colorScheme.primary,
-            child: Text(
-              'Sign in',
-              style: TextStyle(color: Colors.white, fontSize: 16.0),
-            ),
+            child: !_isLoggingIn
+                ? Text(
+                    'Sign in',
+                    style: TextStyle(color: Colors.white, fontSize: 16.0),
+                  )
+                : Center(child: CircularProgressIndicator()),
           ),
           SizedBox(height: 15.0),
           _resetPasswordButton(),

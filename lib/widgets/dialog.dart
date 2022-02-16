@@ -154,8 +154,8 @@ signUpCompletionDialog(BuildContext context) {
           ElevatedButton(
             onPressed: () {
               Navigator.of(context).pop();
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (_) => SignInPage()));
+              Navigator.of(context).pop();
+              showDialog(context: context, builder: (_) => SignInPage());
             },
             child: Text('확인'),
           ),

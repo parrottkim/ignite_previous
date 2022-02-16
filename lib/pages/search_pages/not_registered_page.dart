@@ -23,11 +23,13 @@ class NotRegisteredPage extends StatelessWidget {
                 elevation: 0,
                 minWidth: double.maxFinite,
                 height: 50,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0)),
+                color: Theme.of(context).colorScheme.primary,
                 onPressed: () {
                   Navigator.push(
                       context, createRoute(RegistrationPage(flag: false)));
                 },
-                color: Theme.of(context).primaryColor,
                 child: Text('게임 등록',
                     style: TextStyle(color: Colors.white, fontSize: 16)),
                 textColor: Colors.white,

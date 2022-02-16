@@ -3,9 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:ignite/pages/search_pages/detail_pages/lol_detail_page.dart';
-import 'package:ignite/provider/profile/lol_profile_provider.dart';
 import 'package:ignite/services/service.dart';
-import 'package:provider/provider.dart';
 
 class LOLListView extends StatefulWidget {
   const LOLListView({Key? key}) : super(key: key);

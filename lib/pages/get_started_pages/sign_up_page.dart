@@ -32,8 +32,10 @@ class _SignUpPageState extends State<SignUpPage> {
   bool _isUsernameExists = true;
   bool _isEmailExists = true;
 
-  String signupStatus = '';
-  Color signupStringColor = Colors.green;
+  String _signUpStatus = '';
+  Color _signUpStringColor = Colors.green;
+
+  bool _isSigningUp = false;
 
   _checkUsernameExists(String name) async {
     final firestore = FirebaseFirestore.instance;
@@ -131,19 +133,22 @@ class _SignUpPageState extends State<SignUpPage> {
           .then((result) async {
         if (result == null) {
           setState(() {
-            signupStatus = '계정 생성이 완료되었습니다';
-            signupStringColor = Colors.green;
+            _isSigningUp = false;
+            _signUpStatus = '계정 생성이 완료되었습니다';
+            _signUpStringColor = Colors.green;
           });
           signUpCompletionDialog(context);
         } else {
-          signupStatus = result;
-          signupStringColor = Colors.red;
+          _isSigningUp = false;
+          _signUpStatus = result;
+          _signUpStringColor = Colors.red;
         }
       });
     } else {
       setState(() {
-        signupStatus = 'Please enter every text field';
-        signupStringColor = Colors.red;
+        _isSigningUp = false;
+        _signUpStatus = 'Please enter every text field';
+        _signUpStringColor = Colors.red;
       });
     }
   }
@@ -335,53 +340,68 @@ class _SignUpPageState extends State<SignUpPage> {
                       bottom: new BorderSide(
                           color: Theme.of(context).colorScheme.secondary))),
               child: TextField(
-                  controller: _confirmController,
-                  focusNode: _confirmFocusNode,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    fillColor: Theme.of(context).colorScheme.secondary,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                    labelText: 'Confirm Password',
-                    icon: Icon(
-                      Icons.lock,
-                    ),
-                    // prefix: Icon(icon),
-                    border: InputBorder.none,
-                    errorText: _isConfirmEditing
-                        ? _validateConfirm(_confirmController.text)
-                        : null,
-                    errorStyle: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.secondary),
+                controller: _confirmController,
+                focusNode: _confirmFocusNode,
+                obscureText: true,
+                decoration: InputDecoration(
+                  fillColor: Theme.of(context).colorScheme.secondary,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                  labelText: 'Confirm Password',
+                  icon: Icon(
+                    Icons.lock,
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      _isConfirmEditing = true;
-                    });
-                  },
-                  onSubmitted: (value) {
-                    _confirmFocusNode.unfocus();
-                    signUpRequest();
-                  }),
+                  // prefix: Icon(icon),
+                  border: InputBorder.none,
+                  errorText: _isConfirmEditing
+                      ? _validateConfirm(_confirmController.text)
+                      : null,
+                  errorStyle: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).colorScheme.secondary),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _isConfirmEditing = true;
+                  });
+                },
+                onSubmitted: (_validateUsername(_usernameController.text) ==
+                            null &&
+                        _validateEmail(_emailController.text) == null &&
+                        _validatePassword(_passwordController.text) == null &&
+                        _validateConfirm(_confirmController.text) == null &&
+                        !_isSigningUp)
+                    ? (value) {
+                        setState(() {
+                          _isSigningUp = true;
+                          _signUpStatus = '';
+                          _usernameFocusNode.unfocus();
+                          _emailFocusNode.unfocus();
+                          _passwordFocusNode.unfocus();
+                          _confirmFocusNode.unfocus();
+                        });
+                        signUpRequest();
+                      }
+                    : null,
+              ),
             ),
             SizedBox(height: 15.0),
-            signupStatus != null
+            _signUpStatus != null
                 ? Center(
-                    child: Text(signupStatus,
+                    child: Text(_signUpStatus,
                         style: TextStyle(
-                            color: signupStringColor, fontSize: 14.0)))
+                            color: _signUpStringColor, fontSize: 14.0)))
                 : Container(),
             SizedBox(height: 15.0),
             MaterialButton(
-              elevation: 0.0,
-              minWidth: double.maxFinite,
-              height: 50,
               onPressed: (_validateUsername(_usernameController.text) == null &&
                       _validateEmail(_emailController.text) == null &&
                       _validatePassword(_passwordController.text) == null &&
-                      _validateConfirm(_confirmController.text) == null)
+                      _validateConfirm(_confirmController.text) == null &&
+                      !_isSigningUp)
                   ? () {
                       setState(() {
+                        _isSigningUp = true;
+                        _signUpStatus = '';
                         _usernameFocusNode.unfocus();
                         _emailFocusNode.unfocus();
                         _passwordFocusNode.unfocus();
@@ -390,12 +410,19 @@ class _SignUpPageState extends State<SignUpPage> {
                       signUpRequest();
                     }
                   : null,
+              elevation: 0.0,
+              minWidth: double.maxFinite,
+              height: 50,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0)),
               color: Theme.of(context).colorScheme.secondary,
-              disabledColor: Colors.grey[350],
-              child: Text(
-                'Sign Up',
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
+              disabledColor: !_isSigningUp ? Colors.grey[350] : null,
+              child: !_isSigningUp
+                  ? Text(
+                      'Sign in',
+                      style: TextStyle(color: Colors.white, fontSize: 16.0),
+                    )
+                  : Center(child: CircularProgressIndicator()),
               textColor: Colors.white,
             ),
           ],

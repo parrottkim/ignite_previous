@@ -21,11 +21,13 @@ class SearchPage extends StatelessWidget {
               .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot?> snapshot) {
             if (snapshot.hasData) {
-              return RegisteredPage(snapshot: snapshot.data!);
-            } else if (snapshot.connectionState == ConnectionState.waiting) {
-              return _loadingPage();
+              if (snapshot.data!.docs.isNotEmpty) {
+                return RegisteredPage(snapshot: snapshot.data!);
+              } else if (snapshot.data!.docs.isEmpty) {
+                return NotRegisteredPage();
+              }
             }
-            return NotRegisteredPage();
+            return _loadingPage();
           },
         );
       },

@@ -23,7 +23,7 @@ class _MyInfoPageState extends State<MyInfoPage> {
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
 
-  late i.File _image;
+  late i.File? _image;
   final _picker = ImagePicker();
 
   late TextEditingController _usernameController;
@@ -36,7 +36,7 @@ class _MyInfoPageState extends State<MyInfoPage> {
   bool _isUsernameExists = true;
 
   Future getImage() async {
-    final pickedFile = await _picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       if (pickedFile != null) {
