@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:ignite/models/filters.dart';
 import 'package:ignite/pages/search_pages/detail_pages/lol_detail_page.dart';
 import 'package:ignite/pages/search_pages/detail_pages/pubg_detail_page.dart';
 import 'package:ignite/services/service.dart';
@@ -17,80 +18,246 @@ class _PUBGListViewState extends State<PUBGListView> {
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
 
-  late String? _selectedType = null;
+  final Filters _servers = Filters(
+    title: 'Server filters',
+    filter: {
+      'Steam': 'steam',
+      'Kakao': 'kakao',
+    },
+    isSelected: false,
+    selectedFilter: null,
+  );
 
-  late bool _isTypesSelected;
-  final Map<String, String> _types = {
-    'Duos': 'duos',
-    'Duos FPP': 'duos-fpp',
-    'Squads': 'squads',
-    'Squads FPP': 'squads-fpp',
-    'Ranked': 'ranked',
-    'Ranked FPP': 'ranked-fpp'
-  };
+  final Filters _types = Filters(
+    title: 'Queue type filters',
+    filter: {
+      'Duos': 'duos',
+      'Duos FPP': 'duos-fpp',
+      'Squads': 'squads',
+      'Squads FPP': 'squads-fpp',
+      'Ranked': 'ranked',
+      'Ranked FPP': 'ranked-fpp',
+    },
+    isSelected: false,
+    selectedFilter: null,
+  );
+
+  static const PAGE_SIZE = 10;
+
+  bool _allFetched = false;
+  bool _isLoading = false;
+  List<dynamic> _data = [];
+  DocumentSnapshot? _lastDocument;
+
+  Future<void> _fetchFirestoreData() async {
+    if (_isLoading) return;
+    setState(() => _isLoading = true);
+
+    final documents = await firestore
+        .collection('board')
+        .where('game', isEqualTo: 'lol')
+        .get();
+    final counts = documents.docs.length;
+
+    if (_data.length < counts) {
+      Query _query = firestore
+          .collection('board')
+          .orderBy('date', descending: true)
+          .where('game', isEqualTo: 'pubg');
+      if (_lastDocument != null) {
+        _query = _query.startAfterDocument(_lastDocument!).limit(PAGE_SIZE);
+      } else {
+        _query = _query.limit(PAGE_SIZE);
+      }
+
+      final List paginatedData = await _query.get().then((value) {
+        if (value.docs.isNotEmpty) {
+          _lastDocument = value.docs.last;
+        } else {
+          _lastDocument = null;
+        }
+
+        var items = [];
+        if (_servers.isSelected && _servers.selectedFilter != null) {
+          if (_types.isSelected && _types.selectedFilter != null) {
+            for (var element in value.docs) {
+              if (element['userinfo']['server'] == _servers.selectedFilter &&
+                  element['type'] == _types.selectedFilter) {
+                items.add(element);
+              }
+            }
+          } else {
+            for (var element in value.docs) {
+              if (element['userinfo']['server'] == _servers.selectedFilter) {
+                items.add(element);
+              }
+            }
+          }
+        } else if (_types.isSelected && _types.selectedFilter != null) {
+          if (_servers.isSelected && _servers.selectedFilter != null) {
+            for (var element in value.docs) {
+              if (element['userinfo']['server'] == _servers.selectedFilter &&
+                  element['type'] == _types.selectedFilter) {
+                items.add(element);
+              }
+            }
+          } else {
+            for (var element in value.docs) {
+              if (element['type'] == _types.selectedFilter) {
+                items.add(element);
+              }
+            }
+          }
+        } else {
+          items = value.docs.toList();
+        }
+
+        return items.map((e) => e.data()).toList();
+      });
+
+      setState(() {
+        _data.addAll(paginatedData);
+        if (paginatedData.length < PAGE_SIZE) {
+          _allFetched = true;
+        }
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    _isTypesSelected = false;
+    _servers.isSelected = false;
+    _types.isSelected = false;
+    _fetchFirestoreData();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _filterButton(),
-            SizedBox(height: 6.0),
-            StreamBuilder<QuerySnapshot<Object?>>(
-              stream: firestore
-                  .collection('board')
-                  .where('game', isEqualTo: 'pubg')
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List<QueryDocumentSnapshot> items = [];
-                  if (_isTypesSelected && _selectedType != null) {
-                    for (var element in snapshot.data!.docs) {
-                      if (element['type'] == _selectedType) {
-                        items.add(element);
-                      }
-                    }
-                  } else {
-                    items = snapshot.data!.docs.toList();
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _filterButton(),
+          SizedBox(height: 6.0),
+          Expanded(
+            child: NotificationListener<ScrollEndNotification>(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: _data.length + (_allFetched ? 0 : 1),
+                itemBuilder: (context, index) {
+                  if (index == _data.length) {
+                    return const SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
                   }
 
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      return AnimationConfiguration.staggeredList(
-                        position: index,
-                        duration: const Duration(milliseconds: 500),
-                        child: SlideAnimation(
-                          verticalOffset: 50.0,
-                          child: FadeInAnimation(
-                            child: _items(items, items[index]['user'], index),
-                          ),
-                        ),
-                      );
-                    },
+                  var items = _data[index];
+
+                  return AnimationConfiguration.staggeredList(
+                    position: index,
+                    duration: const Duration(milliseconds: 500),
+                    child: SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: _items(items, items['user']),
+                      ),
+                    ),
                   );
-                } else
-                  return Center(child: CircularProgressIndicator());
+                },
+              ),
+              onNotification: (scrollEnd) {
+                if (scrollEnd.metrics.atEdge && scrollEnd.metrics.pixels > 0) {
+                  _fetchFirestoreData();
+                }
+                return true;
               },
             ),
-          ],
-        ),
+          ),
+          // StreamBuilder<QuerySnapshot<Object?>>(
+          //   stream: firestore
+          //       .collection('board')
+          //       .orderBy('date', descending: true)
+          //       .where('game', isEqualTo: 'pubg')
+          //       .snapshots(),
+          //   builder: (context, snapshot) {
+          //     if (snapshot.hasData) {
+          //       List<QueryDocumentSnapshot> items = [];
+          //       if (_servers.isSelected && _servers.selectedFilter != null) {
+          //         if (_types.isSelected && _types.selectedFilter != null) {
+          //           for (var element in snapshot.data!.docs) {
+          //             if (element['userinfo']['server'] ==
+          //                     _servers.selectedFilter &&
+          //                 element['type'] == _types.selectedFilter) {
+          //               items.add(element);
+          //             }
+          //           }
+          //         } else {
+          //           for (var element in snapshot.data!.docs) {
+          //             if (element['userinfo']['server'] ==
+          //                 _servers.selectedFilter) {
+          //               items.add(element);
+          //             }
+          //           }
+          //         }
+          //       } else if (_types.isSelected &&
+          //           _types.selectedFilter != null) {
+          //         if (_servers.isSelected &&
+          //             _servers.selectedFilter != null) {
+          //           for (var element in snapshot.data!.docs) {
+          //             if (element['userinfo']['server'] ==
+          //                     _servers.selectedFilter &&
+          //                 element['type'] == _types.selectedFilter) {
+          //               items.add(element);
+          //             }
+          //           }
+          //         } else {
+          //           for (var element in snapshot.data!.docs) {
+          //             if (element['type'] == _types.selectedFilter) {
+          //               items.add(element);
+          //             }
+          //           }
+          //         }
+          //       } else {
+          //         items = snapshot.data!.docs.toList();
+          //       }
+
+          //       return ListView.builder(
+          //         shrinkWrap: true,
+          //         physics: const NeverScrollableScrollPhysics(),
+          //         itemCount: items.length,
+          //         itemBuilder: (context, index) {
+          //           return AnimationConfiguration.staggeredList(
+          //             position: index,
+          //             duration: const Duration(milliseconds: 500),
+          //             child: SlideAnimation(
+          //               verticalOffset: 50.0,
+          //               child: FadeInAnimation(
+          //                 child: _items(items, items[index]['user'], index),
+          //               ),
+          //             ),
+          //           );
+          //         },
+          //       );
+          //     } else
+          //       return Center(child: CircularProgressIndicator());
+          //   },
+          // ),
+        ],
       ),
     );
   }
 
-  Widget _items(List<QueryDocumentSnapshot> data, String user, int index) {
+  Widget _items(
+    Map<String, dynamic> data,
+    String user,
+  ) {
     return FutureBuilder(
       future: firestore
           .collection('user')
@@ -105,7 +272,7 @@ class _PUBGListViewState extends State<PUBGListView> {
               onTap: () => Navigator.push(
                 context,
                 createRoute(
-                  PUBGDetailPage(data: data[index], snapshot: snapshot),
+                  PUBGDetailPage(data: data, snapshot: snapshot),
                 ),
               ),
               child: Container(
@@ -114,12 +281,12 @@ class _PUBGListViewState extends State<PUBGListView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      data[index]['title'],
+                      data['title'],
                       style: TextStyle(
                           fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 2.0),
-                    Text(data[index]['content']),
+                    Text(data['content']),
                     SizedBox(height: 14.0),
                     Row(
                       children: [
@@ -180,7 +347,7 @@ class _PUBGListViewState extends State<PUBGListView> {
                                 ),
                               ]),
                           child: Text(
-                            _pubgTypeWidgets(data[index]['type']),
+                            _pubgTypeWidgets(data['type']),
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: Colors.white,
@@ -194,12 +361,20 @@ class _PUBGListViewState extends State<PUBGListView> {
                     Divider(height: 1.0),
                     SizedBox(height: 14.0),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          width: 20.0,
+                          child: Image.asset(
+                            'assets/images/server_icons/${data['userinfo']['server']}.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                         Row(
                           children: [
                             Text(
-                              snapshot.data!['name'],
+                              data['userinfo']['username'],
                               style: TextStyle(
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15.0,
@@ -209,10 +384,10 @@ class _PUBGListViewState extends State<PUBGListView> {
                             SizedBox(
                               height: 24.0,
                               width: 24.0,
-                              child: snapshot.data!['profileImage'] != null
+                              child: data['userinfo']['profileImage'] != null
                                   ? CircleAvatar(
                                       backgroundImage: NetworkImage(
-                                          snapshot.data!['profileImage']),
+                                          data['userinfo']['profileImage']),
                                     )
                                   : CircleAvatar(),
                             ),
@@ -226,12 +401,12 @@ class _PUBGListViewState extends State<PUBGListView> {
             ),
           );
         } else
-          return SizedBox();
+          return const SizedBox();
       },
     );
   }
 
-  _filterDialog(int flag) {
+  _filterDialog(Filters filter) {
     return showModalBottomSheet(
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -263,8 +438,12 @@ class _PUBGListViewState extends State<PUBGListView> {
                           IconButton(
                             onPressed: () {
                               setState(() {
-                                _selectedType = null;
-                                _isTypesSelected = false;
+                                filter.selectedFilter = null;
+                                filter.isSelected = false;
+
+                                _data.clear();
+                                _lastDocument = null;
+                                _fetchFirestoreData();
                               });
                               Navigator.of(context).pop();
                             },
@@ -275,15 +454,29 @@ class _PUBGListViewState extends State<PUBGListView> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemCount: _types.length,
+                        itemCount: filter.filter.length,
                         itemBuilder: (context, index) {
-                          String key = _types.keys.elementAt(index);
+                          String key = filter.filter.keys.elementAt(index);
                           return ListTile(
                             onTap: () {
-                              setState(() => _isTypesSelected = true);
-                              _selectedType = _types[key];
+                              setState(() {
+                                filter.selectedFilter = filter.filter[key];
+                                filter.isSelected = true;
+
+                                _data.clear();
+                                _lastDocument = null;
+                                _fetchFirestoreData();
+                              });
+
                               Navigator.of(context).pop();
                             },
+                            leading: filter.filter.keys.first == 'Steam'
+                                ? Image.asset(
+                                    'assets/images/server_icons/${filter.filter[key]}.png',
+                                    width: 24.0,
+                                    height: 24.0,
+                                  )
+                                : null,
                             title: Text(key),
                           );
                         },
@@ -316,7 +509,7 @@ class _PUBGListViewState extends State<PUBGListView> {
         SizedBox(width: 4.0),
         InkWell(
           onTap: () async {
-            await _filterDialog(1);
+            await _filterDialog(_servers);
             setState(() {});
           },
           customBorder: RoundedRectangleBorder(
@@ -327,14 +520,43 @@ class _PUBGListViewState extends State<PUBGListView> {
             decoration: BoxDecoration(
               border: Border.all(
                   width: 0.5,
-                  color: !_isTypesSelected ? Colors.black : Colors.transparent),
+                  color:
+                      !_servers.isSelected ? Colors.black : Colors.transparent),
               borderRadius: BorderRadius.all(Radius.circular(20.0)),
-              color: !_isTypesSelected ? Colors.transparent : Colors.black,
+              color: !_servers.isSelected ? Colors.transparent : Colors.black,
+            ),
+            child: Text(
+              'Server',
+              style: TextStyle(
+                color: !_servers.isSelected ? Colors.black : Colors.white,
+                fontSize: 14.0,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(width: 4.0),
+        InkWell(
+          onTap: () async {
+            await _filterDialog(_types);
+            setState(() {});
+          },
+          customBorder: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+            decoration: BoxDecoration(
+              border: Border.all(
+                  width: 0.5,
+                  color:
+                      !_types.isSelected ? Colors.black : Colors.transparent),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              color: !_types.isSelected ? Colors.transparent : Colors.black,
             ),
             child: Text(
               'Queue type',
               style: TextStyle(
-                color: !_isTypesSelected ? Colors.black : Colors.white,
+                color: !_types.isSelected ? Colors.black : Colors.white,
                 fontSize: 14.0,
               ),
             ),

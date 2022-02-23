@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 
 class LOLDetailPage extends StatefulWidget {
-  final QueryDocumentSnapshot<Object?> data;
+  final Map<String, dynamic> data;
   final AsyncSnapshot<DocumentSnapshot> snapshot;
   LOLDetailPage({Key? key, required this.data, required this.snapshot})
       : super(key: key);

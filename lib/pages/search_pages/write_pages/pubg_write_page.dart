@@ -96,6 +96,12 @@ class _PUBGWritePageState extends State<PUBGWritePage> {
                     'type': _selectedType,
                     'user': _authenticationProvider.currentUser!.uid,
                     'date': DateTime.now(),
+                    'userinfo': {
+                      'username': _pubgProfileProvider.pubgUser!.name,
+                      'server': _pubgProfileProvider.pubgUser!.server,
+                      'profileImage':
+                          _pubgProfileProvider.pubgUser!.profileImage,
+                    }
                   });
                   Navigator.pop(context);
                   Navigator.pop(context);

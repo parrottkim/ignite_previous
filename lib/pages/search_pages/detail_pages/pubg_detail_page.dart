@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:shimmer/shimmer.dart';
 
 class PUBGDetailPage extends StatefulWidget {
-  final QueryDocumentSnapshot<Object?> data;
+  final Map<String, dynamic> data;
   final AsyncSnapshot<DocumentSnapshot> snapshot;
   PUBGDetailPage({Key? key, required this.data, required this.snapshot})
       : super(key: key);

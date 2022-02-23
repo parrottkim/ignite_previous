@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/animations/fade_animations.dart';
+import 'package:ignite/pages/home_pages/pro_settings_page.dart';
 import 'package:ignite/pages/my_pages/registration_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
 import 'package:ignite/provider/theme_provider.dart';
@@ -282,12 +283,14 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(context, createRoute(ProSettingsPage()));
+                  },
                   child: Padding(
                     padding:
                         EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
                     child: Text(
-                      'see details >',
+                      'See details >',
                     ),
                   ),
                 ),

@@ -78,7 +78,7 @@ class PUBGRepository {
       final Map<String, dynamic> userData = jsonDecode(response.body);
       final Map<String, dynamic> rankData =
           userData['data']['attributes']['rankedGameModeStats'];
-      return PUBGUser.fromJson(userInfo, rankData, profileImage);
+      return PUBGUser.fromJson(userInfo, rankData, profileImage, server);
     } else
       return null;
   }

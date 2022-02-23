@@ -162,6 +162,12 @@ class _LOLWritePageState extends State<LOLWritePage> {
   }
 
   @override
+  void dispose() {
+    lolUser = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),

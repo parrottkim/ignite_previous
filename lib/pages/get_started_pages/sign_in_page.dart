@@ -276,7 +276,7 @@ class _SignInPageState extends State<SignInPage> {
                         focusNode: _resetFocusNode,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                            fillColor: Theme.of(context).primaryColor,
+                            fillColor: Theme.of(context).colorScheme.primary,
                             contentPadding:
                                 const EdgeInsets.symmetric(horizontal: 10.0),
                             labelText: 'Email',
@@ -293,7 +293,9 @@ class _SignInPageState extends State<SignInPage> {
                       onPressed: () {
                         _resetPasswordRequest();
                       },
-                      color: Theme.of(context).primaryColor,
+                      color: Theme.of(context).colorScheme.primary,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0)),
                       disabledColor: Colors.grey[350],
                       minWidth: double.infinity,
                       height: 50,
