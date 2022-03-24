@@ -21,43 +21,11 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   late ProfilePageProvider _profilePageProvider;
 
-  Map _images = Map<String, Image>();
-  bool _imageLoaded = false;
-
-  Future preloadImages() async {
-    await firestore.collection('gamelist').get().then((snapshots) {
-      snapshots.docs.forEach((element) {
-        _images.putIfAbsent(element.data()['id'],
-            () => Image.network(element.data()['imageLink']));
-      });
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    preloadImages().then((_) {
-      _images.forEach((key, value) async {
-        await precacheImage(value.image, context).then((_) {
-          if (mounted) setState(() {});
-        });
-        _imageLoaded = true;
-      });
-    });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _profilePageProvider =
-        Provider.of<ProfilePageProvider>(context, listen: false);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
-      body: _imageLoaded ? _bodyContainer() : CircularProgressWidget(),
+      body: _bodyContainer(),
     );
   }
 
@@ -115,7 +83,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
-                      _images[snapshot.data!.docs[index]['id']],
+                      Image.network(snapshot.data!.docs[index]['imageLink']),
                       Padding(
                           padding: EdgeInsets.symmetric(horizontal: 30.0),
                           child: Divider(height: 10.0)),
