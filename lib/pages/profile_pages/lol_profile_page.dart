@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ignite/models/profile/lol.dart';
 import 'package:ignite/pages/dashboard_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
-import 'package:ignite/provider/bottom_navigation_provider.dart';
+import 'package:ignite/provider/page_provider.dart';
 import 'package:ignite/provider/profile/lol_profile_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +17,7 @@ class LOLProfilePage extends StatefulWidget {
 class _LOLProfilePageState extends State<LOLProfilePage>
     with SingleTickerProviderStateMixin {
   late AuthenticationProvider _authenticationProvider;
-  late BottomNavigationProvider _bottomNavigationProvider;
+  late PageProvider _pageProvider;
   late LOLProfileProvider _lolProfileProvider;
 
   final firestore = FirebaseFirestore.instance;
@@ -72,10 +72,10 @@ class _LOLProfilePageState extends State<LOLProfilePage>
                     Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DashboardPage(index: 1),
+                          builder: (context) => DashboardPage(),
                         ),
                         (route) => false);
-                    _bottomNavigationProvider.updatePage(1);
+                    _pageProvider.updatePage(1);
                   },
                   child: Text('확인'),
                 ),
@@ -147,8 +147,7 @@ class _LOLProfilePageState extends State<LOLProfilePage>
     super.didChangeDependencies();
     _authenticationProvider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-    _bottomNavigationProvider =
-        Provider.of<BottomNavigationProvider>(context, listen: false);
+    _pageProvider = Provider.of<PageProvider>(context, listen: false);
     _lolProfileProvider =
         Provider.of<LOLProfileProvider>(context, listen: false);
   }

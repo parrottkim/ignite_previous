@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ignite/models/profile/pubg.dart';
 import 'package:ignite/pages/dashboard_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
-import 'package:ignite/provider/bottom_navigation_provider.dart';
+import 'package:ignite/provider/page_provider.dart';
 import 'package:ignite/provider/profile/pubg_profile_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +17,7 @@ class PUBGProfilePage extends StatefulWidget {
 class _PUBGProfilePageState extends State<PUBGProfilePage>
     with SingleTickerProviderStateMixin {
   late AuthenticationProvider _authenticationProvider;
-  late BottomNavigationProvider _bottomNavigationProvider;
+  late PageProvider _pageProvider;
   late PUBGProfileProvider _pubgProfileProvider;
 
   final firestore = FirebaseFirestore.instance;
@@ -76,10 +76,10 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
                     Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => DashboardPage(index: 1),
+                          builder: (context) => DashboardPage(),
                         ),
                         (route) => false);
-                    _bottomNavigationProvider.updatePage(1);
+                    _pageProvider.updatePage(1);
                   },
                   child: Text('확인'),
                 ),
@@ -153,8 +153,7 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
     super.didChangeDependencies();
     _authenticationProvider =
         Provider.of<AuthenticationProvider>(context, listen: false);
-    _bottomNavigationProvider =
-        Provider.of<BottomNavigationProvider>(context, listen: false);
+    _pageProvider = Provider.of<PageProvider>(context, listen: false);
     _pubgProfileProvider =
         Provider.of<PUBGProfileProvider>(context, listen: false);
   }

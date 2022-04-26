@@ -1,18 +1,29 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/pages/auth_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
-import 'package:ignite/provider/bottom_navigation_provider.dart';
+import 'package:ignite/provider/page_provider.dart';
 import 'package:ignite/provider/profile/lol_profile_provider.dart';
 import 'package:ignite/provider/profile/pubg_profile_provider.dart';
 import 'package:ignite/provider/profile_page_provider.dart';
 import 'package:ignite/provider/theme_provider.dart';
 import 'package:provider/provider.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  print(await messaging.getToken());
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 
@@ -27,7 +38,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
             create: (_) => AuthenticationProvider(FirebaseAuth.instance)),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => BottomNavigationProvider()),
+        ChangeNotifierProvider(create: (_) => PageProvider()),
         ChangeNotifierProvider(create: (_) => ProfilePageProvider()),
         ChangeNotifierProvider(create: (_) => LOLProfileProvider()),
         ChangeNotifierProvider(create: (_) => PUBGProfileProvider()),

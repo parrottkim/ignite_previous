@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/models/chat_user.dart';
 import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/services/service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
@@ -26,17 +27,6 @@ class _DetailChatPageState extends State<DetailChatPage> {
 
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
-
-  String _getDetailDate(DateTime dateTime) {
-    DateTime now = DateTime.now();
-    DateTime justNow = now.subtract(Duration(seconds: 30));
-    DateTime localDateTime = dateTime.toLocal();
-    if (!localDateTime.difference(justNow).isNegative) {
-      return 'Just now';
-    }
-    String roughTimeString = DateFormat('jm').format(dateTime);
-    return '$roughTimeString';
-  }
 
   Future _sendMessage() async {
     String docId = firestore
@@ -244,7 +234,7 @@ class _DetailChatPageState extends State<DetailChatPage> {
                       : SizedBox(),
                   Text(
                     messages[index]['sentAt'] != null
-                        ? _getDetailDate(messages[index]['sentAt'].toDate())
+                        ? getDetailDate(messages[index]['sentAt'].toDate())
                         : '',
                     style: TextStyle(
                       color: Colors.grey[600],

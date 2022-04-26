@@ -29,6 +29,8 @@ class _PUBGDetailPageState extends State<PUBGDetailPage> {
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
 
+  bool _isEntering = false;
+
   Future<ChatUser?> _getChatMembers(List<dynamic> members) async {
     ChatUser? chatMember;
     for (var member in members) {
@@ -147,10 +149,20 @@ class _PUBGDetailPageState extends State<PUBGDetailPage> {
     return widget.data['user'] != _authenticationProvider.currentUser!.uid
         ? FloatingActionButton(
             heroTag: null,
-            onPressed: () async {
-              await _enterChatGroup();
-            },
-            child: Icon(Icons.chat_bubble),
+            onPressed: !_isEntering
+                ? () async {
+                    setState(() {
+                      _isEntering = true;
+                    });
+                    await _enterChatGroup();
+                    setState(() {
+                      _isEntering = false;
+                    });
+                  }
+                : null,
+            child: !_isEntering
+                ? Icon(Icons.chat_bubble)
+                : CircularProgressIndicator(color: Colors.white),
           )
         : null;
   }

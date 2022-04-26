@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ignite/pages/dashboard_page.dart';
 import 'package:ignite/provider/authentication_provider.dart';
-import 'package:ignite/provider/bottom_navigation_provider.dart';
+import 'package:ignite/provider/page_provider.dart';
 import 'package:ignite/widgets/dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +14,7 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   late AuthenticationProvider _authenticationProvider;
-  late BottomNavigationProvider _bottomNavigationProvider;
+  late PageProvider _pageProvider;
 
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
@@ -51,7 +51,6 @@ class _SignInPageState extends State<SignInPage> {
             ),
             (_) => false,
           );
-          _bottomNavigationProvider.updatePage(0);
         } else if (result == '이메일 주소 인증이 필요합니다') {
           setState(() {
             _isLoggingIn = false;
@@ -97,8 +96,7 @@ class _SignInPageState extends State<SignInPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _authenticationProvider = Provider.of<AuthenticationProvider>(context);
-    _bottomNavigationProvider =
-        Provider.of<BottomNavigationProvider>(context, listen: false);
+    _pageProvider = Provider.of<PageProvider>(context, listen: false);
   }
 
   @override

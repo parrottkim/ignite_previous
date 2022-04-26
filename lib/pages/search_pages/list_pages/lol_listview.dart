@@ -5,6 +5,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:ignite/models/filters.dart';
 import 'package:ignite/pages/search_pages/detail_pages/lol_detail_page.dart';
 import 'package:ignite/services/service.dart';
+import 'package:shimmer/shimmer.dart';
 
 class LOLListView extends StatefulWidget {
   const LOLListView({Key? key}) : super(key: key);
@@ -135,121 +136,13 @@ class _LOLListViewState extends State<LOLListView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _filterButton(),
-          SizedBox(height: 6.0),
-          Expanded(
-            child: NotificationListener<ScrollEndNotification>(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: _data.length + (_allFetched ? 0 : 1),
-                itemBuilder: (context, index) {
-                  if (index == _data.length) {
-                    return const SizedBox(
-                      width: double.infinity,
-                      height: 60,
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-
-                  var items = _data[index];
-
-                  return AnimationConfiguration.staggeredList(
-                    position: index,
-                    duration: const Duration(milliseconds: 500),
-                    child: SlideAnimation(
-                      verticalOffset: 50.0,
-                      child: FadeInAnimation(
-                        child: _items(items, items['user']),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              onNotification: (scrollEnd) {
-                if (scrollEnd.metrics.atEdge && scrollEnd.metrics.pixels > 0) {
-                  _fetchFirestoreData();
-                }
-                return true;
-              },
-            ),
-          ),
-          // StreamBuilder<QuerySnapshot<Object?>>(
-          //   stream: firestore
-          //       .collection('board')
-          //       .orderBy('date', descending: true)
-          //       .where('game', isEqualTo: 'lol')
-          //       .snapshots(),
-          //   builder: (context, snapshot) {
-          //     if (snapshot.hasData) {
-          //       List<QueryDocumentSnapshot> items = [];
-          //       if (_positions.isSelected &&
-          //           _positions.selectedFilter != null) {
-          //         if (_types.isSelected && _types.selectedFilter != null) {
-          //           for (var element in snapshot.data!.docs) {
-          //             if (element['lane'] == _positions.selectedFilter &&
-          //                 element['type'] == _types.selectedFilter) {
-          //               items.add(element);
-          //             }
-          //           }
-          //         } else {
-          //           for (var element in snapshot.data!.docs) {
-          //             if (element['lane'] == _positions.selectedFilter) {
-          //               items.add(element);
-          //             }
-          //           }
-          //         }
-          //       } else if (_types.isSelected &&
-          //           _types.selectedFilter != null) {
-          //         if (_positions.isSelected &&
-          //             _positions.selectedFilter != null) {
-          //           for (var element in snapshot.data!.docs) {
-          //             if (element['lane'] == _positions.selectedFilter &&
-          //                 element['type'] == _types.selectedFilter) {
-          //               items.add(element);
-          //             }
-          //           }
-          //         } else {
-          //           for (var element in snapshot.data!.docs) {
-          //             if (element['type'] == _types.selectedFilter) {
-          //               items.add(element);
-          //             }
-          //           }
-          //         }
-          //       } else {
-          //         items = snapshot.data!.docs.toList();
-          //       }
-
-          //       return ListView.builder(
-          //         shrinkWrap: true,
-          //         physics: const NeverScrollableScrollPhysics(),
-          //         itemCount: items.length,
-          //         itemBuilder: (context, index) {
-          //           return AnimationConfiguration.staggeredList(
-          //             position: index,
-          //             duration: const Duration(milliseconds: 500),
-          //             child: SlideAnimation(
-          //               verticalOffset: 50.0,
-          //               child: FadeInAnimation(
-          //                 child: _items(items, items[index]['user'], index),
-          //               ),
-          //             ),
-          //           );
-          //         },
-          //       );
-          //     } else {
-          //       return const Center(child: CircularProgressIndicator());
-          //     }
-          //   },
-          // ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _filterButton(),
+        SizedBox(height: 6.0),
+        _listWidget(),
+      ],
     );
   }
 
@@ -402,6 +295,55 @@ class _LOLListViewState extends State<LOLListView> {
           return const SizedBox();
         }
       },
+    );
+  }
+
+  Widget _listWidget() {
+    return Expanded(
+      child: NotificationListener<ScrollEndNotification>(
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
+          itemCount: _data.length + (_allFetched ? 0 : 1),
+          itemBuilder: (context, index) {
+            if (index == _data.length) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Shimmer.fromColors(
+                  child: Container(
+                    height: 20.0,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    ),
+                  ),
+                  baseColor: Colors.grey.withOpacity(0.1),
+                  highlightColor: Colors.grey.withOpacity(0.3),
+                ),
+              );
+            }
+
+            var items = _data[index];
+
+            return AnimationConfiguration.staggeredList(
+              position: index,
+              duration: const Duration(milliseconds: 500),
+              child: SlideAnimation(
+                verticalOffset: 50.0,
+                child: FadeInAnimation(
+                  child: _items(items, items['user']),
+                ),
+              ),
+            );
+          },
+        ),
+        onNotification: (scrollEnd) {
+          if (scrollEnd.metrics.atEdge && scrollEnd.metrics.pixels > 0) {
+            _fetchFirestoreData();
+          }
+          return true;
+        },
+      ),
     );
   }
 

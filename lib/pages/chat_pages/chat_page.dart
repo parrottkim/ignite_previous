@@ -8,8 +8,6 @@ import 'package:ignite/services/service.dart';
 import 'package:ignite/widgets/circular_progress_widget.dart';
 import 'package:provider/provider.dart';
 
-import 'package:intl/intl.dart';
-
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
 
@@ -19,32 +17,6 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final firestore = FirebaseFirestore.instance;
-
-  String _getDetailDate(DateTime dateTime) {
-    DateTime now = DateTime.now();
-    DateTime justNow = now.subtract(Duration(seconds: 30));
-    DateTime localDateTime = dateTime.toLocal();
-    if (!localDateTime.difference(justNow).isNegative) {
-      return 'Just now';
-    }
-    String roughTimeString = DateFormat('jm').format(dateTime);
-    if (localDateTime.day == now.day &&
-        localDateTime.month == now.month &&
-        localDateTime.year == now.year) {
-      return roughTimeString;
-    }
-    DateTime yesterday = now.subtract(Duration(days: 1));
-    if (localDateTime.day == yesterday.day &&
-        localDateTime.month == now.month &&
-        localDateTime.year == now.year) {
-      return 'Yesterday, ' + roughTimeString;
-    }
-    if (now.difference(localDateTime).inDays < 4) {
-      String weekday = DateFormat('EEEE').format(localDateTime);
-      return '$weekday, $roughTimeString';
-    }
-    return '${DateFormat('yyyy.MM.dd').format(dateTime)}, $roughTimeString';
-  }
 
   Future<ChatUser?> _getChatMembers(
       AuthenticationProvider value, List<dynamic> members) async {
@@ -114,7 +86,7 @@ class _ChatPageState extends State<ChatPage> {
                   children: <Widget>[
                     Text(
                         query['modifiedAt'] != null
-                            ? _getDetailDate(query['modifiedAt'].toDate())
+                            ? getDetailDate(query['modifiedAt'].toDate())
                             : '',
                         style:
                             TextStyle(color: Colors.black38, fontSize: 12.0)),
@@ -142,7 +114,7 @@ class _ChatPageState extends State<ChatPage> {
               }
               return Text(
                   query['modifiedAt'] != null
-                      ? _getDetailDate(query['modifiedAt'].toDate())
+                      ? getDetailDate(query['modifiedAt'].toDate())
                       : '',
                   style: TextStyle(color: Colors.black38, fontSize: 12.0));
             },

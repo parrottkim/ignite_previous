@@ -131,6 +131,7 @@ class _ProSettingsPageState extends State<ProSettingsPage> {
                 height: size.height * 0.1 + 60.0,
                 child: ListView.builder(
                   shrinkWrap: true,
+                  physics: ClampingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
