@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/widgets/circular_progress_widget.dart';
 import 'package:ignite/widgets/dialog.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,7 +18,7 @@ class MyInfoPage extends StatefulWidget {
 }
 
 class _MyInfoPageState extends State<MyInfoPage> {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
 
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
@@ -63,7 +63,7 @@ class _MyInfoPageState extends State<MyInfoPage> {
                 ],
               ));
     } else {
-      var path = 'ProfileImages/${_authenticationProvider.currentUser!.uid}';
+      var path = 'ProfileImages/${_authProvider.currentUser!.uid}';
 
       var task = storage.ref(path).putFile(i.File(pickedFile.path));
       showDialog(
@@ -88,7 +88,7 @@ class _MyInfoPageState extends State<MyInfoPage> {
       print(downloadUrl);
       await firestore
           .collection('user')
-          .doc(_authenticationProvider.currentUser!.uid)
+          .doc(_authProvider.currentUser!.uid)
           .set({'avatar': downloadUrl}, SetOptions(merge: true));
     }
   }
@@ -122,19 +122,14 @@ class _MyInfoPageState extends State<MyInfoPage> {
   }
 
   Future _changeUsername(String username) async {
-    _authenticationProvider.currentUser!.updateDisplayName(username);
-    await firestore
-        .collection('user')
-        .doc(_authenticationProvider.currentUser!.uid)
-        .set({
+    _authProvider.currentUser!.updateDisplayName(username);
+    await firestore.collection('user').doc(_authProvider.currentUser!.uid).set({
       'username': username,
     }, SetOptions(merge: true));
   }
 
   _resetPasswordRequest(String email) async {
-    await _authenticationProvider
-        .sendPasswordResetEmail(email: email)
-        .then((result) {
+    await _authProvider.sendPasswordResetEmail(email: email).then((result) {
       if (result) {
         resetPasswordDialog(context);
       } else {
@@ -148,8 +143,7 @@ class _MyInfoPageState extends State<MyInfoPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
   @override
@@ -177,7 +171,7 @@ class _MyInfoPageState extends State<MyInfoPage> {
       child: StreamBuilder(
         stream: firestore
             .collection('user')
-            .doc(_authenticationProvider.currentUser!.uid)
+            .doc(_authProvider.currentUser!.uid)
             .snapshots(),
         builder: (context, AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (!snapshot.hasData) {

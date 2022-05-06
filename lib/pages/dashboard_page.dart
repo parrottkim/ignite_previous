@@ -1,13 +1,12 @@
-import 'dart:io';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:ignite/pages/chat_pages/chat_page.dart';
+import 'package:ignite/pages/chat_pages/chatgroup_page.dart';
 import 'package:ignite/pages/home_pages/home_page.dart';
 import 'package:ignite/pages/my_pages/my_page.dart';
 import 'package:ignite/pages/search_pages/search_page.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/provider/page_provider.dart';
-import 'package:ignite/services/service.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -18,7 +17,10 @@ class DashboardPage extends StatefulWidget {
   _DashboardPageState createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends State<DashboardPage>
+    with WidgetsBindingObserver {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   Future<void> setupInteractedMessage() async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         FlutterLocalNotificationsPlugin();
@@ -103,7 +105,24 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
     setupInteractedMessage();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    var currentUser =
+        Provider.of<AuthProvider>(context, listen: false).currentUser!;
+    if (state == AppLifecycleState.resumed) {
+      _firestore.collection('user').doc(currentUser.uid).set({
+        'isOnline': true,
+      }, SetOptions(merge: true));
+    } else {
+      _firestore.collection('user').doc(currentUser.uid).set({
+        'isOnline': false,
+      }, SetOptions(merge: true));
+    }
   }
 
   @override
@@ -117,7 +136,7 @@ class _DashboardPageState extends State<DashboardPage> {
             children: [
               HomePage(),
               SearchPage(),
-              ChatPage(),
+              ChatgroupPage(),
               MyPage(),
             ],
           ),

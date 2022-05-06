@@ -3,7 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/pages/search_pages/write_pages/lol_write_page.dart';
 import 'package:ignite/pages/search_pages/write_pages/pubg_write_page.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +17,7 @@ class WritePostPage extends StatefulWidget {
 
 class _WritePostPageState extends State<WritePostPage>
     with SingleTickerProviderStateMixin {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
 
   final firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
@@ -82,8 +82,7 @@ class _WritePostPageState extends State<WritePostPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
   @override

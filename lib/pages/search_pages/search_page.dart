@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/pages/search_pages/not_registered_page.dart';
 import 'package:ignite/pages/search_pages/registered_page.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class SearchPage extends StatelessWidget {
@@ -11,7 +11,7 @@ class SearchPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final firestore = FirebaseFirestore.instance;
-    return Consumer<AuthenticationProvider>(
+    return Consumer<AuthProvider>(
       builder: (context, value, widget) {
         return StreamBuilder(
           stream: firestore

@@ -51,8 +51,8 @@ class _RegisteredPageState extends State<RegisteredPage> {
           await precacheImage(value.image, context).then((_) {
             setState(() {});
           });
-          _imageLoaded = true;
         }
+        _imageLoaded = true;
       });
     });
   }

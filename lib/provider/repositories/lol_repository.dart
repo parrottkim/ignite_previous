@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:ignite/models/profile/lol.dart';
 
@@ -11,7 +12,7 @@ class LOLRepository {
     'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
     'Accept-Charset': 'application/x-www-form-urlencoded; charset=UTF-8',
     'Origin': 'https://developer.riotgames.com',
-    'X-Riot-Token': 'XXXX',
+    'X-Riot-Token': dotenv.env['riot_key']!,
   };
 
   Future getUserName(String username) async {

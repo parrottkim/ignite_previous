@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/models/profile/pubg.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/provider/profile/pubg_profile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -15,7 +15,7 @@ class PUBGWritePage extends StatefulWidget {
 }
 
 class _PUBGWritePageState extends State<PUBGWritePage> {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
   late PUBGProfileProvider _pubgProfileProvider;
 
   PUBGUser? pubgUser;
@@ -45,7 +45,7 @@ class _PUBGWritePageState extends State<PUBGWritePage> {
   Future _refreshGameProfile() async {
     await firestore
         .collection('user')
-        .doc(_authenticationProvider.currentUser!.uid)
+        .doc(_authProvider.currentUser!.uid)
         .collection('accounts')
         .doc('pubg')
         .get()
@@ -58,7 +58,7 @@ class _PUBGWritePageState extends State<PUBGWritePage> {
 
       await firestore
           .collection('user')
-          .doc(_authenticationProvider.currentUser!.uid)
+          .doc(_authProvider.currentUser!.uid)
           .collection('accounts')
           .doc('pubg')
           .set({
@@ -94,7 +94,7 @@ class _PUBGWritePageState extends State<PUBGWritePage> {
                     'title': _titleController.text,
                     'content': _contentController.text,
                     'type': _selectedType,
-                    'user': _authenticationProvider.currentUser!.uid,
+                    'user': _authProvider.currentUser!.uid,
                     'date': DateTime.now(),
                     'userinfo': {
                       'username': _pubgProfileProvider.pubgUser!.name,
@@ -142,8 +142,7 @@ class _PUBGWritePageState extends State<PUBGWritePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
     _pubgProfileProvider =
         Provider.of<PUBGProfileProvider>(context, listen: false);
 

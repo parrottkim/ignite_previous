@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/animations/fade_animations.dart';
 import 'package:ignite/pages/my_pages/registration_page.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/provider/page_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:ignite/widgets/home_logo.dart';
@@ -17,7 +17,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
   late PageProvider _pageProvider;
 
   final firestore = FirebaseFirestore.instance;
@@ -59,8 +59,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
     _pageProvider = Provider.of<PageProvider>(context, listen: false);
   }
 
@@ -77,7 +76,7 @@ class _HomePageState extends State<HomePage> {
   AppBar _appBarWidget(Size size) {
     return AppBar(
       title: Text(
-        'Hello, ${_authenticationProvider.currentUser!.displayName}!',
+        'Hello, ${_authProvider.currentUser!.displayName}!',
         style: TextStyle(
           fontSize: 16.0,
           fontWeight: FontWeight.w300,
@@ -92,7 +91,7 @@ class _HomePageState extends State<HomePage> {
         FutureBuilder<DocumentSnapshot>(
           future: firestore
               .collection('user')
-              .doc(_authenticationProvider.currentUser!.uid)
+              .doc(_authProvider.currentUser!.uid)
               .get(),
           builder: (context, snapshot) {
             return snapshot.hasData

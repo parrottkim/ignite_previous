@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ignite/pages/dashboard_page.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/provider/page_provider.dart';
 import 'package:ignite/widgets/dialog.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +13,7 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
   late PageProvider _pageProvider;
 
   late TextEditingController _emailController;
@@ -32,7 +32,7 @@ class _SignInPageState extends State<SignInPage> {
   void signInRequest() async {
     if (_emailController.text.isNotEmpty &&
         _passwordController.text.isNotEmpty) {
-      await _authenticationProvider
+      await _authProvider
           .signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
@@ -77,7 +77,7 @@ class _SignInPageState extends State<SignInPage> {
 
   _resetPasswordRequest() async {
     if (_resetController.text.isNotEmpty) {
-      await _authenticationProvider
+      await _authProvider
           .sendPasswordResetEmail(email: _resetController.text.trim())
           .then((result) {
         if (result) {
@@ -95,7 +95,7 @@ class _SignInPageState extends State<SignInPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationProvider = Provider.of<AuthenticationProvider>(context);
+    _authProvider = Provider.of<AuthProvider>(context);
     _pageProvider = Provider.of<PageProvider>(context, listen: false);
   }
 

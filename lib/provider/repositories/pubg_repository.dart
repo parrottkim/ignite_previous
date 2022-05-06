@@ -1,15 +1,15 @@
 import 'dart:convert';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:ignite/models/profile/pubg.dart';
 
 class PUBGRepository {
   final headers = {
-    'Authorization':
-        'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJqdGkiOiIzMDZjNTk3MC04MDAxLTAxMzktYzY0ZC00Yjg5YzBlYzRiYTciLCJpc3MiOiJnYW1lbG9ja2VyIiwiaWF0IjoxNjE4NDgxNjI2LCJwdWIiOiJibHVlaG9sZSIsInRpdGxlIjoicHViZyIsImFwcCI6Imlnbml0ZSJ9.S7ulcI7IZuezkwLAofKD2RO62gsb9cFolK-GfnRCvGU',
+    'Authorization': 'Bearer ${dotenv.env['pubg_key']!}',
     'Accept': 'application/vnd.api+json'
   };
-  final steamKey = 'B361EB85702B6B805C1A76E2719E7E0B';
+  final steamKey = dotenv.env['steam_key']!;
 
   Future getSteamProfile(String username) async {
     final url =

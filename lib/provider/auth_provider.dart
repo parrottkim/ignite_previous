@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 
-class AuthenticationProvider with ChangeNotifier {
+class AuthProvider with ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FirebaseAuth _auth;
-  AuthenticationProvider(this._auth);
+  AuthProvider(this._auth);
 
   User? get currentUser => _auth.currentUser;
 
@@ -32,6 +34,7 @@ class AuthenticationProvider with ChangeNotifier {
         'email': email,
         'manners': 0,
         'skill': 0,
+        'token': await _messaging.getToken(),
       });
       return errorMessage;
     } on FirebaseException catch (e) {
@@ -66,8 +69,11 @@ class AuthenticationProvider with ChangeNotifier {
 
       if (user != null && !user.emailVerified) {
         await user.sendEmailVerification();
-        return '이메일 주소 인증이 필요합니다';
+        return 'Email authentication is required';
       }
+      await _firestore.collection('user').doc(userCredential.user!.uid).set({
+        'token': await _messaging.getToken(),
+      }, SetOptions(merge: true));
     } on FirebaseException catch (e) {
       switch (e.code) {
         case 'invalid-email':

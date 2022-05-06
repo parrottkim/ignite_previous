@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/models/profile/lol.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/provider/profile/lol_profile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -17,7 +17,7 @@ class LOLWritePage extends StatefulWidget {
 }
 
 class _LOLWritePageState extends State<LOLWritePage> {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
   late LOLProfileProvider _lolProfileProvider;
 
   LOLUser? lolUser;
@@ -55,7 +55,7 @@ class _LOLWritePageState extends State<LOLWritePage> {
   Future _refreshGameProfile() async {
     await firestore
         .collection('user')
-        .doc(_authenticationProvider.currentUser!.uid)
+        .doc(_authProvider.currentUser!.uid)
         .collection('accounts')
         .doc('lol')
         .get()
@@ -67,7 +67,7 @@ class _LOLWritePageState extends State<LOLWritePage> {
 
       await firestore
           .collection('user')
-          .doc(_authenticationProvider.currentUser!.uid)
+          .doc(_authProvider.currentUser!.uid)
           .collection('accounts')
           .doc('lol')
           .set({
@@ -107,7 +107,7 @@ class _LOLWritePageState extends State<LOLWritePage> {
                     'title': _titleController.text,
                     'content': _contentController.text,
                     'type': _selectedType,
-                    'user': _authenticationProvider.currentUser!.uid,
+                    'user': _authProvider.currentUser!.uid,
                     'date': DateTime.now(),
                   });
                   Navigator.pop(context);
@@ -149,8 +149,7 @@ class _LOLWritePageState extends State<LOLWritePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
     _lolProfileProvider =
         Provider.of<LOLProfileProvider>(context, listen: false);
 

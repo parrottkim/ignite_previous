@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/widgets/dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -12,7 +12,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
 
   late TextEditingController _usernameController;
   late TextEditingController _emailController;
@@ -101,7 +101,7 @@ class _SignUpPageState extends State<SignUpPage> {
     if (value.isEmpty) {
       return 'Password can\'t be empty';
     } else if (value.length < 6) {
-      return 'Length of password should be greater than 6';
+      return 'Must be at least 6 characters long';
     }
     return null;
   }
@@ -124,7 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
         _validateEmail(_emailController.text) == null &&
         _validatePassword(_passwordController.text) == null &&
         _validateConfirm(_confirmController.text) == null) {
-      await _authenticationProvider
+      await _authProvider
           .signUp(
         username: _usernameController.text.trim(),
         email: _emailController.text.trim(),
@@ -156,8 +156,7 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
   @override

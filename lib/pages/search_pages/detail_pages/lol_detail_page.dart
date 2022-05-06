@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/models/chat_user.dart';
-import 'package:ignite/pages/chat_pages/detail_chat_page.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/pages/chat_pages/chat_page.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/provider/profile/lol_profile_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +23,7 @@ class LOLDetailPage extends StatefulWidget {
 }
 
 class _LOLDetailPageState extends State<LOLDetailPage> {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
   late LOLProfileProvider _lolProfileProvider;
 
   final firestore = FirebaseFirestore.instance;
@@ -37,7 +37,7 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
     ChatUser? chatMember;
     for (var member in members) {
       await firestore.collection('user').doc(member).get().then((element) {
-        if (member != _authenticationProvider.currentUser!.uid)
+        if (member != _authProvider.currentUser!.uid)
           chatMember = new ChatUser(
             id: element.id,
             username: element['username'],
@@ -55,13 +55,10 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
     await firestore.collection('chatgroup').doc(docId).set({
       'createdAt': Timestamp.now(),
       'modifiedAt': Timestamp.now(),
-      'createdBy': _authenticationProvider.currentUser!.uid,
+      'createdBy': _authProvider.currentUser!.uid,
       'id': docId,
       'isPrivate': true,
-      'members': [
-        _authenticationProvider.currentUser!.uid,
-        widget.data['user']
-      ],
+      'members': [_authProvider.currentUser!.uid, widget.data['user']],
       'recentMessage': {
         'messageText': '',
         'sentAt': Timestamp.now(),
@@ -72,10 +69,8 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
     final snapshot = await firestore.collection('chatgroup').doc(docId).get();
     ChatUser? chatMember = await _getChatMembers(snapshot['members']);
 
-    Navigator.push(
-        context,
-        createRoute(
-            DetailChatPage(chatMember: chatMember!, chatgroupId: docId)));
+    Navigator.push(context,
+        createRoute(ChatPage(members: chatMember!, chatgroupId: docId)));
   }
 
   Future _enterChatGroup() async {
@@ -89,12 +84,12 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
         .then((value) async {
       value.docs.forEach((element) async {
         if (unorderedEquality(element.data()['members'],
-            [_authenticationProvider.currentUser!.uid, widget.data['user']])) {
+            [_authProvider.currentUser!.uid, widget.data['user']])) {
           ChatUser? chatMember = await _getChatMembers(element['members']);
           Navigator.push(
               context,
-              createRoute(DetailChatPage(
-                  chatMember: chatMember!, chatgroupId: element.id)));
+              createRoute(
+                  ChatPage(members: chatMember!, chatgroupId: element.id)));
         } else {
           await _createChatGroup();
           return;
@@ -109,8 +104,7 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
     super.didChangeDependencies();
     _lolProfileProvider =
         Provider.of<LOLProfileProvider>(context, listen: false);
-    _authenticationProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     _lolProfileProvider.loadUserMastery(widget.snapshot.data!['name']).then(
         (_) => setState(() => _bannerImage =
@@ -158,7 +152,7 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
   }
 
   Widget? _floatingActionButton() {
-    return widget.data['user'] != _authenticationProvider.currentUser!.uid
+    return widget.data['user'] != _authProvider.currentUser!.uid
         ? FloatingActionButton(
             heroTag: null,
             onPressed: !_isEntering
@@ -315,7 +309,7 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
     return FutureBuilder<DocumentSnapshot>(
       future: firestore
           .collection('user')
-          .doc(_authenticationProvider.currentUser!.uid)
+          .doc(_authProvider.currentUser!.uid)
           .get(),
       builder: (context, snapshot) {
         if (!snapshot.hasData)

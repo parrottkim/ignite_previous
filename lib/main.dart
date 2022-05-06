@@ -2,8 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ignite/pages/auth_page.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/provider/page_provider.dart';
 import 'package:ignite/provider/profile/lol_profile_provider.dart';
 import 'package:ignite/provider/profile/pubg_profile_provider.dart';
@@ -21,9 +22,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-  print(await messaging.getToken());
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await dotenv.load(fileName: 'assets/.env');
   runApp(const MyApp());
 }
 
@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (_) => AuthenticationProvider(FirebaseAuth.instance)),
+            create: (_) => AuthProvider(FirebaseAuth.instance)),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => PageProvider()),
         ChangeNotifierProvider(create: (_) => ProfilePageProvider()),

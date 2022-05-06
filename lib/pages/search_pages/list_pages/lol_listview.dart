@@ -116,13 +116,15 @@ class _LOLListViewState extends State<LOLListView> {
         return items.map((e) => e.data()).toList();
       });
 
-      setState(() {
-        _data.addAll(paginatedData);
-        if (paginatedData.length < PAGE_SIZE) {
-          _allFetched = true;
-        }
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _data.addAll(paginatedData);
+          if (paginatedData.length < PAGE_SIZE) {
+            _allFetched = true;
+          }
+          _isLoading = false;
+        });
+      }
     }
   }
 

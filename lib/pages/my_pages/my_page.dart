@@ -4,7 +4,7 @@ import 'package:ignite/pages/get_started_pages/get_started_page.dart';
 import 'package:ignite/pages/my_pages/my_info_page.dart';
 import 'package:ignite/pages/my_pages/notice_page.dart';
 import 'package:ignite/pages/my_pages/registration_page.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:ignite/widgets/dialog.dart';
 import 'package:local_auth/auth_strings.dart';
@@ -19,7 +19,7 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
   final LocalAuthentication _localAuthentication = LocalAuthentication();
 
   Future<bool> _isBiometricAvailable() async {
@@ -72,8 +72,7 @@ class _MyPageState extends State<MyPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
   @override
@@ -92,7 +91,7 @@ class _MyPageState extends State<MyPage> {
           icon: Icon(Icons.logout),
           tooltip: '로그아웃',
           onPressed: () async {
-            await _authenticationProvider.signOut().then((result) {
+            await _authProvider.signOut().then((result) {
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => GetStartedPage()),

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:ignite/models/profile/lol.dart';
 import 'package:ignite/pages/dashboard_page.dart';
-import 'package:ignite/provider/authentication_provider.dart';
+import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/provider/page_provider.dart';
 import 'package:ignite/provider/profile/lol_profile_provider.dart';
 import 'package:provider/provider.dart';
@@ -16,7 +16,7 @@ class LOLProfilePage extends StatefulWidget {
 
 class _LOLProfilePageState extends State<LOLProfilePage>
     with SingleTickerProviderStateMixin {
-  late AuthenticationProvider _authenticationProvider;
+  late AuthProvider _authProvider;
   late PageProvider _pageProvider;
   late LOLProfileProvider _lolProfileProvider;
 
@@ -43,7 +43,7 @@ class _LOLProfilePageState extends State<LOLProfilePage>
   _addSummonerDialog(LOLUser lolUser) async {
     await firestore
         .collection('user')
-        .doc(_authenticationProvider.currentUser!.uid)
+        .doc(_authProvider.currentUser!.uid)
         .collection('accounts')
         .doc('lol')
         .set({
@@ -89,7 +89,7 @@ class _LOLProfilePageState extends State<LOLProfilePage>
   _addSummonerData(LOLUser lolUser) async {
     await firestore
         .collection('user')
-        .doc(_authenticationProvider.currentUser!.uid)
+        .doc(_authProvider.currentUser!.uid)
         .collection('accounts')
         .doc('lol')
         .get()
@@ -145,8 +145,7 @@ class _LOLProfilePageState extends State<LOLProfilePage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _authenticationProvider =
-        Provider.of<AuthenticationProvider>(context, listen: false);
+    _authProvider = Provider.of<AuthProvider>(context, listen: false);
     _pageProvider = Provider.of<PageProvider>(context, listen: false);
     _lolProfileProvider =
         Provider.of<LOLProfileProvider>(context, listen: false);
