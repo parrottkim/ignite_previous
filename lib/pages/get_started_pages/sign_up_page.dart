@@ -175,7 +175,6 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.all(10.0),
       content: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(

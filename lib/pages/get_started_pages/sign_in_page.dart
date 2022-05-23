@@ -113,7 +113,6 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: EdgeInsets.all(10.0),
       content: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(

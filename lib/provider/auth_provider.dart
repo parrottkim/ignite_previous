@@ -38,6 +38,7 @@ class AuthProvider with ChangeNotifier {
         'skill': 0,
         'token': await _messaging.getToken(),
         'fcmId': count.docs.length + 1,
+        'isOnline': false,
       });
       return errorMessage;
     } on FirebaseException catch (e) {
