@@ -18,7 +18,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late AuthProvider _authProvider;
-  late PageProvider _pageProvider;
 
   final firestore = FirebaseFirestore.instance;
 
@@ -60,7 +59,6 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _authProvider = Provider.of<AuthProvider>(context, listen: false);
-    _pageProvider = Provider.of<PageProvider>(context, listen: false);
   }
 
   @override
@@ -76,7 +74,7 @@ class _HomePageState extends State<HomePage> {
   AppBar _appBarWidget(Size size) {
     return AppBar(
       title: Text(
-        'Hello, ${_authProvider.currentUser!.displayName}!',
+        'Hello, ${_authProvider.currentUser?.displayName}!',
         style: TextStyle(
           fontSize: 16.0,
           fontWeight: FontWeight.w300,
@@ -91,7 +89,7 @@ class _HomePageState extends State<HomePage> {
         FutureBuilder<DocumentSnapshot>(
           future: firestore
               .collection('user')
-              .doc(_authProvider.currentUser!.uid)
+              .doc(_authProvider.currentUser?.uid)
               .get(),
           builder: (context, snapshot) {
             return snapshot.hasData
@@ -99,9 +97,11 @@ class _HomePageState extends State<HomePage> {
                     splashRadius: 28.0,
                     onPressed: () {},
                     icon: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        snapshot.data!['avatar'],
-                      ),
+                      backgroundImage: snapshot.data!['avatar'].isNotEmpty
+                          ? NetworkImage(
+                              snapshot.data!['avatar'],
+                            )
+                          : null,
                     ),
                   )
                 : SizedBox();
@@ -134,9 +134,10 @@ class _HomePageState extends State<HomePage> {
                 delay: Duration(milliseconds: 1250),
                 offset: Offset(0.0, 10.0),
                 child: OutlinedButton(
-                  onPressed: () {
-                    _pageProvider.updatePage(1);
-                  },
+                  onPressed: () => setState(() {
+                    Provider.of<PageProvider>(context, listen: false)
+                        .updatePage(1);
+                  }),
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18.0),

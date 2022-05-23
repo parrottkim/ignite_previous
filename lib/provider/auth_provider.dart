@@ -28,6 +28,8 @@ class AuthProvider with ChangeNotifier {
         user.updateDisplayName(username);
       }
 
+      var count = await _firestore.collection('user').get();
+
       await _firestore.collection('user').doc(userCredential.user!.uid).set({
         'avatar': '',
         'username': username,
@@ -35,6 +37,7 @@ class AuthProvider with ChangeNotifier {
         'manners': 0,
         'skill': 0,
         'token': await _messaging.getToken(),
+        'fcmId': count.docs.length + 1,
       });
       return errorMessage;
     } on FirebaseException catch (e) {

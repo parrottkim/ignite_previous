@@ -13,4 +13,11 @@ class PageProvider extends ChangeNotifier {
     _currentIndex = index;
     notifyListeners();
   }
+
+  initialize() {
+    _currentIndex = 0;
+    _pageController.animateToPage(0,
+        duration: Duration(milliseconds: 200), curve: Curves.ease);
+    notifyListeners();
+  }
 }

@@ -17,7 +17,6 @@ class PUBGProfilePage extends StatefulWidget {
 class _PUBGProfilePageState extends State<PUBGProfilePage>
     with SingleTickerProviderStateMixin {
   late AuthProvider _authProvider;
-  late PageProvider _pageProvider;
   late PUBGProfileProvider _pubgProfileProvider;
 
   final firestore = FirebaseFirestore.instance;
@@ -79,7 +78,8 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
                           builder: (context) => DashboardPage(),
                         ),
                         (route) => false);
-                    _pageProvider.updatePage(1);
+                    Provider.of<PageProvider>(context, listen: false)
+                        .updatePage(1);
                   },
                   child: Text('확인'),
                 ),
@@ -152,7 +152,6 @@ class _PUBGProfilePageState extends State<PUBGProfilePage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _authProvider = Provider.of<AuthProvider>(context, listen: false);
-    _pageProvider = Provider.of<PageProvider>(context, listen: false);
     _pubgProfileProvider =
         Provider.of<PUBGProfileProvider>(context, listen: false);
   }

@@ -22,6 +22,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
   late ProfilePageProvider _profilePageProvider;
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _profilePageProvider =
+        Provider.of<ProfilePageProvider>(context, listen: false);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),

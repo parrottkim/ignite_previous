@@ -37,13 +37,14 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
     ChatUser? chatMember;
     for (var member in members) {
       await firestore.collection('user').doc(member).get().then((element) {
-        if (member != _authProvider.currentUser!.uid)
-          chatMember = new ChatUser(
+        if (member != _authProvider.currentUser!.uid) {
+          chatMember = ChatUser(
             id: element.id,
             username: element['username'],
             email: element['email'],
             avatar: element['avatar'],
           );
+        }
       });
     }
     return chatMember;
@@ -77,26 +78,27 @@ class _LOLDetailPageState extends State<LOLDetailPage> {
     Function unorderedEquality =
         const DeepCollectionEquality.unordered().equals;
 
-    await firestore
+    var element = await firestore
         .collection('chatgroup')
         .where('members', arrayContains: widget.data['user'])
         .get()
         .then((value) async {
-      value.docs.forEach((element) async {
+      for (var element in value.docs) {
         if (unorderedEquality(element.data()['members'],
             [_authProvider.currentUser!.uid, widget.data['user']])) {
-          ChatUser? chatMember = await _getChatMembers(element['members']);
-          Navigator.push(
-              context,
-              createRoute(
-                  ChatPage(members: chatMember!, chatgroupId: element.id)));
-        } else {
-          await _createChatGroup();
-          return;
+          return element;
         }
-      });
-      if (value.docs.isEmpty) await _createChatGroup();
+      }
+      return null;
     });
+
+    if (element != null) {
+      ChatUser? chatMember = await _getChatMembers(element.data()['members']);
+      Navigator.push(context,
+          createRoute(ChatPage(members: chatMember!, chatgroupId: element.id)));
+    } else {
+      await _createChatGroup();
+    }
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:ignite/pages/my_pages/my_info_page.dart';
 import 'package:ignite/pages/my_pages/notice_page.dart';
 import 'package:ignite/pages/my_pages/registration_page.dart';
 import 'package:ignite/provider/auth_provider.dart';
+import 'package:ignite/provider/page_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:ignite/widgets/dialog.dart';
 import 'package:local_auth/auth_strings.dart';
@@ -92,6 +93,7 @@ class _MyPageState extends State<MyPage> {
           tooltip: '로그아웃',
           onPressed: () async {
             await _authProvider.signOut().then((result) {
+              Provider.of<PageProvider>(context, listen: false).initialize();
               Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (_) => GetStartedPage()),

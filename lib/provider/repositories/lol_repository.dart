@@ -71,7 +71,7 @@ class LOLRepository {
   Future getUserMastery(String username) async {
     final String most = await getMostChampion(username);
     final response = await http.get(Uri.parse(
-        'http://ddragon.leagueoflegends.com/cdn/12.1.1/data/en_US/champion.json'));
+        'http://ddragon.leagueoflegends.com/cdn/12.8.1/data/en_US/champion.json'));
     final List<dynamic> body = [];
     jsonDecode(response.body)['data'].forEach((key, value) {
       body.add(value);

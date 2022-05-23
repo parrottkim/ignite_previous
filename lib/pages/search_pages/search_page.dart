@@ -16,7 +16,7 @@ class SearchPage extends StatelessWidget {
         return StreamBuilder(
           stream: firestore
               .collection('user')
-              .doc(value.currentUser!.uid)
+              .doc(value.currentUser?.uid)
               .collection('accounts')
               .snapshots(),
           builder: (context, AsyncSnapshot<QuerySnapshot?> snapshot) {

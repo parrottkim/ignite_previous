@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ignite/models/chat_user.dart';
 import 'package:ignite/provider/auth_provider.dart';
 import 'package:ignite/services/service.dart';
 import 'package:provider/provider.dart';
 import 'package:collection/collection.dart';
+
+import 'package:http/http.dart' as http;
 
 class ChatPage extends StatelessWidget {
   final ChatUser members;
@@ -417,7 +421,7 @@ class _MessageTextBoxState extends State<MessageTextBox> {
   late TextEditingController _messageController;
   late FocusNode _messageFocusNode;
 
-  Future _sendMessage() async {
+  Future _sendMessage(String message) async {
     var currentUser =
         Provider.of<AuthProvider>(context, listen: false).currentUser!;
     String docId = _firestore
@@ -432,7 +436,7 @@ class _MessageTextBoxState extends State<MessageTextBox> {
         .collection('messages')
         .doc(docId)
         .set({
-      'messageText': _messageController.text,
+      'messageText': message,
       'sentAt': FieldValue.serverTimestamp(),
       'sentBy': currentUser.uid,
       'isRead': false,
@@ -440,11 +444,49 @@ class _MessageTextBoxState extends State<MessageTextBox> {
     await _firestore.collection('chatgroup').doc(widget.chatgroupId).set({
       'modifiedAt': FieldValue.serverTimestamp(),
       'recentMessage': {
-        'messageText': _messageController.text,
+        'messageText': message,
         'sentBy': currentUser.uid,
       },
     }, SetOptions(merge: true));
-    _messageController.clear();
+  }
+
+  Future _sendNotifictaion(String message) async {
+    var currentUser =
+        Provider.of<AuthProvider>(context, listen: false).currentUser!;
+    print(widget.members.id);
+    var user = await _firestore
+        .collection('user')
+        .doc(widget.members.id)
+        .get()
+        .then((value) {
+      return value;
+    });
+
+    try {
+      await http.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'key=${dotenv.env['server_token']!}',
+        },
+        body: jsonEncode({
+          'to': user['token'],
+          'priority': 'high',
+          'notification': {
+            'title': currentUser.displayName,
+            'body': message,
+            'sound': 'default'
+          },
+          'data': {
+            'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+            'id': user['fcmId'],
+            'status': 'done'
+          }
+        }),
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -487,7 +529,12 @@ class _MessageTextBoxState extends State<MessageTextBox> {
             ),
             InkWell(
               onTap: () async {
-                if (_messageController.text.isNotEmpty) await _sendMessage();
+                if (_messageController.text.isNotEmpty) {
+                  var message = _messageController.text;
+                  _messageController.clear();
+                  await _sendMessage(message);
+                  await _sendNotifictaion(message);
+                }
               },
               child: Container(
                 padding: EdgeInsets.all(12.0),

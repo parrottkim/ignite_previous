@@ -32,12 +32,13 @@ class ChatgroupList extends StatefulWidget {
 class _ChatgroupListState extends State<ChatgroupList> {
   final _firestore = FirebaseFirestore.instance;
 
-  Future<ChatUser?> _getMembers(User currentUser, List<dynamic> members) async {
+  Future<ChatUser?> _getMembers(
+      User? currentUser, List<dynamic> members) async {
     ChatUser? chatMember;
 
     for (var member in members) {
       await _firestore.collection('user').doc(member).get().then((element) {
-        if (member != currentUser.uid) {
+        if (member != currentUser?.uid) {
           return chatMember = ChatUser(
             id: element.id,
             username: element['username'],
@@ -53,11 +54,11 @@ class _ChatgroupListState extends State<ChatgroupList> {
   @override
   Widget build(BuildContext context) {
     var currentUser =
-        Provider.of<AuthProvider>(context, listen: false).currentUser!;
+        Provider.of<AuthProvider>(context, listen: false).currentUser;
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore
           .collection('chatgroup')
-          .where('members', arrayContains: currentUser.uid)
+          .where('members', arrayContains: currentUser?.uid)
           .orderBy('modifiedAt', descending: true)
           .snapshots(),
       builder: (context, chatgroup) {
@@ -111,7 +112,7 @@ class _ChatgroupListState extends State<ChatgroupList> {
 }
 
 class ChatgroupListItem extends StatefulWidget {
-  final User currentUser;
+  final User? currentUser;
   final QueryDocumentSnapshot chatgroup;
   final ChatUser members;
   ChatgroupListItem({
@@ -168,7 +169,7 @@ class _ChatgroupListItemState extends State<ChatgroupListItem> {
                 .doc(widget.chatgroup['id'])
                 .collection('messages')
                 .where('isRead', isEqualTo: false)
-                .where('sentBy', isNotEqualTo: widget.currentUser.uid)
+                .where('sentBy', isNotEqualTo: widget.currentUser?.uid)
                 .snapshots(),
             builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
               if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {

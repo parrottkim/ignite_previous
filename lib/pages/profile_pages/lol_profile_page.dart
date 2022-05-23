@@ -75,7 +75,8 @@ class _LOLProfilePageState extends State<LOLProfilePage>
                           builder: (context) => DashboardPage(),
                         ),
                         (route) => false);
-                    _pageProvider.updatePage(1);
+                    Provider.of<PageProvider>(context, listen: false)
+                        .updatePage(1);
                   },
                   child: Text('확인'),
                 ),
@@ -291,7 +292,7 @@ class _LOLProfilePageState extends State<LOLProfilePage>
       child: ListTile(
         leading: CircleAvatar(
             backgroundImage: NetworkImage(
-                'https://ddragon.leagueoflegends.com/cdn/11.6.1/img/profileicon/${lolUser.profileIconId}.png'),
+                'https://ddragon.leagueoflegends.com/cdn/12.8.1/img/profileicon/${lolUser.profileIconId}.png'),
             child: Text('${lolUser.summonerLevel}',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,

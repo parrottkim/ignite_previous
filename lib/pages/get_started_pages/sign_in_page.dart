@@ -113,82 +113,105 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      content: _dialogContent(),
-    );
-  }
-
-  Widget _dialogContent() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Text(
-              'Sign in',
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                fontFamily: 'BarlowSemiCondensed',
-                fontSize: 26.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          SizedBox(height: 20.0),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 5.0),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Theme.of(context).colorScheme.secondary,
+      insetPadding: EdgeInsets.all(10.0),
+      content: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Sign in',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontFamily: 'BarlowSemiCondensed',
+                  fontSize: 26.0,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            child: TextField(
-              controller: _emailController,
-              focusNode: _emailFocusNode,
-              keyboardType: TextInputType.emailAddress,
-              autofillHints: [AutofillHints.email],
-              decoration: InputDecoration(
-                  fillColor: Theme.of(context).colorScheme.secondary,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                  labelText: 'Email',
-                  icon: Icon(
-                    Icons.email,
+            SizedBox(height: 20.0),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 5.0),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
-                  border: InputBorder.none),
-              onSubmitted: (value) {
-                _emailFocusNode.unfocus();
-                FocusScope.of(context).requestFocus(_passwordFocusNode);
-              },
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 5.0),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Theme.of(context).colorScheme.secondary,
                 ),
               ),
+              child: TextField(
+                controller: _emailController,
+                focusNode: _emailFocusNode,
+                keyboardType: TextInputType.emailAddress,
+                autofillHints: [AutofillHints.email],
+                decoration: InputDecoration(
+                    fillColor: Theme.of(context).colorScheme.secondary,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                    labelText: 'Email',
+                    icon: Icon(
+                      Icons.email,
+                    ),
+                    border: InputBorder.none),
+                onSubmitted: (value) {
+                  _emailFocusNode.unfocus();
+                  FocusScope.of(context).requestFocus(_passwordFocusNode);
+                },
+              ),
             ),
-            child: TextField(
-              controller: _passwordController,
-              focusNode: _passwordFocusNode,
-              keyboardType: TextInputType.text,
-              autofillHints: [AutofillHints.password],
-              obscureText: true,
-              decoration: InputDecoration(
-                  fillColor: Theme.of(context).colorScheme.secondary,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                  labelText: 'Password',
-                  icon: Icon(
-                    Icons.lock,
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 5.0),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Theme.of(context).colorScheme.secondary,
                   ),
-                  border: InputBorder.none),
-              onSubmitted: !_isLoggingIn
-                  ? (value) {
+                ),
+              ),
+              child: TextField(
+                controller: _passwordController,
+                focusNode: _passwordFocusNode,
+                keyboardType: TextInputType.text,
+                autofillHints: [AutofillHints.password],
+                obscureText: true,
+                decoration: InputDecoration(
+                    fillColor: Theme.of(context).colorScheme.secondary,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                    labelText: 'Password',
+                    icon: Icon(
+                      Icons.lock,
+                    ),
+                    border: InputBorder.none),
+                onSubmitted: !_isLoggingIn
+                    ? (value) {
+                        setState(() {
+                          _isLoggingIn = true;
+                          _loginStatus = '';
+                          _emailFocusNode.unfocus();
+                          _passwordFocusNode.unfocus();
+                        });
+                        signInRequest();
+                      }
+                    : null,
+              ),
+            ),
+            SizedBox(height: 15),
+            _loginStatus.isNotEmpty
+                ? Center(
+                    child: Text(
+                      _loginStatus,
+                      style: TextStyle(
+                        color: _loginStringColor,
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  )
+                : Container(),
+            SizedBox(height: 15.0),
+            MaterialButton(
+              onPressed: !_isLoggingIn
+                  ? () {
                       setState(() {
                         _isLoggingIn = true;
                         _loginStatus = '';
@@ -198,49 +221,23 @@ class _SignInPageState extends State<SignInPage> {
                       signInRequest();
                     }
                   : null,
+              elevation: 0.0,
+              minWidth: double.maxFinite,
+              height: 50.0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0)),
+              color: Theme.of(context).colorScheme.primary,
+              child: !_isLoggingIn
+                  ? Text(
+                      'Sign in',
+                      style: TextStyle(color: Colors.white, fontSize: 16.0),
+                    )
+                  : Center(child: CircularProgressIndicator()),
             ),
-          ),
-          SizedBox(height: 15),
-          _loginStatus.isNotEmpty
-              ? Center(
-                  child: Text(
-                    _loginStatus,
-                    style: TextStyle(
-                      color: _loginStringColor,
-                      fontSize: 14.0,
-                    ),
-                  ),
-                )
-              : Container(),
-          SizedBox(height: 15.0),
-          MaterialButton(
-            onPressed: !_isLoggingIn
-                ? () {
-                    setState(() {
-                      _isLoggingIn = true;
-                      _loginStatus = '';
-                      _emailFocusNode.unfocus();
-                      _passwordFocusNode.unfocus();
-                    });
-                    signInRequest();
-                  }
-                : null,
-            elevation: 0.0,
-            minWidth: double.maxFinite,
-            height: 50.0,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-            color: Theme.of(context).colorScheme.primary,
-            child: !_isLoggingIn
-                ? Text(
-                    'Sign in',
-                    style: TextStyle(color: Colors.white, fontSize: 16.0),
-                  )
-                : Center(child: CircularProgressIndicator()),
-          ),
-          SizedBox(height: 15.0),
-          _resetPasswordButton(),
-        ],
+            SizedBox(height: 15.0),
+            _resetPasswordButton(),
+          ],
+        ),
       ),
     );
   }
